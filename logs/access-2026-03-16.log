@@ -1,1 +1,4 @@
 [2026-03-16T21:32:28.202Z] POST /auth/login 200 64ms - IP: ::1
+[2026-03-16T21:35:24.583Z] GET /catalogos/divipol?divipolDepto=CAUCA 200 7ms - IP: ::1
+[2026-03-16T21:37:58.498Z] POST /jornadas 201 19ms - IP: ::1
+[2026-03-16T21:40:37.279Z] POST /via-tramos 201 10ms - IP: ::1
