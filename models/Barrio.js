@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 
 const barrioSchema = new mongoose.Schema({
-    barrioNumero: { type: Number, required: true },
-    barrioLetra:  { type: String },
+    nombre:       { type: String, required: true },
     deptoDivipol: { type: String },
     deptoNombre:  { type: String },
     munDivipol:   { type: String },

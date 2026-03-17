@@ -2,3 +2,7 @@
 [2026-03-16T21:35:24.583Z] GET /catalogos/divipol?divipolDepto=CAUCA 200 7ms - IP: ::1
 [2026-03-16T21:37:58.498Z] POST /jornadas 201 19ms - IP: ::1
 [2026-03-16T21:40:37.279Z] POST /via-tramos 201 10ms - IP: ::1
+[2026-03-16T23:17:16.416Z] POST /auth/login 401 13ms - IP: ::1
+[2026-03-16T23:17:22.526Z] POST /auth/login 200 62ms - IP: ::1
+[2026-03-16T23:37:07.971Z] POST /auth/login 200 62ms - IP: ::1
+[2026-03-16T23:48:07.963Z] POST /auth/login 200 49ms - IP: ::1
