@@ -38,7 +38,7 @@ const viaTramoSchema = new mongoose.Schema({
     // Datos generales
     entidadVia:     { type: String },
     respVia:        { type: String },
-    encuestador:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    encuestador:    { type: String },
     supervisor:     { type: String },
     zat:            { type: mongoose.Schema.Types.ObjectId, ref: 'Zat' },
     comuna:         { type: mongoose.Schema.Types.ObjectId, ref: 'Comuna' },
@@ -109,6 +109,7 @@ const viaTramoSchema = new mongoose.Schema({
     // Daños como array de subdocumentos
     danos: [danoSchema],
 
+    
     // Fotos
     fotos: [{ type: String }],
 

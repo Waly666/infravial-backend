@@ -8,8 +8,20 @@ async function getAll(req, res) {
         res.status(500).json({ message: err.message });
     }
 }
-
 async function getById(req, res) {
+    try {
+        console.log('Buscando tramo ID:', req.params.id);
+        const tramo = await viaTramoService.getById(req.params.id);
+        console.log('Tramo encontrado:', tramo?._id);
+        if (!tramo) return res.status(404).json({ message: 'Tramo no encontrado INFRAVIAL' });
+        res.json({ message: 'Via Tramo INFRAVIAL', tramo });
+    } catch (err) {
+        console.error('ERROR getById:', err.message);
+        console.error('STACK:', err.stack);
+        res.status(500).json({ message: err.message });
+    }
+}
+/*async function getById(req, res) {
     try {
         const tramo = await viaTramoService.getById(req.params.id);
         if (!tramo) return res.status(404).json({ message: 'Tramo no encontrado INFRAVIAL' });
@@ -17,13 +29,14 @@ async function getById(req, res) {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+}*/
 
 async function create(req, res) {
     try {
         const tramo = await viaTramoService.create(req.body, req.user.id);
         res.status(201).json({ message: 'Tramo creado INFRAVIAL', tramo });
     } catch (err) {
+        console.error('ERROR getById ViaTramo:', err); // ← agregar
         res.status(400).json({ message: err.message });
     }
 }

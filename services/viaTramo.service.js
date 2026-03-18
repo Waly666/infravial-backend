@@ -51,21 +51,29 @@ function calcularAnchoTotal(data) {
 }
 
 async function getAll(filtros = {}) {
-    return await ViaTramo.find(filtros)
-        .populate('idJornada', 'municipio dpto fechaJornada')
-        .populate('encuestador', 'nombres apellidos')
-        .populate('perfilEsquema', 'codEsquema urlImgEsq')
+     return await ViaTramo.find(filtros)
+        .populate('idJornada', 'municipio dpto supervisor')
+        .populate('zat', 'zatNumero zatLetra')
+        .populate('comuna', 'comunaNumero comunaLetra')
+        .populate('barrio', 'nombre')
+        .populate('perfilEsquema', 'codEsquema calzada')
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await ViaTramo.findById(id)
-        .populate('idJornada')
-        .populate('encuestador', 'nombres apellidos')
-        .populate('perfilEsquema')
-        .populate('zat').populate('comuna').populate('barrio')
-        .populate('obs1').populate('obs2').populate('obs3')
-        .populate('obs4').populate('obs5').populate('obs6');
+        .populate('idJornada', 'municipio dpto supervisor localidad fechaJornada')
+        .populate('zat', 'zatNumero zatLetra')
+        .populate('comuna', 'comunaNumero comunaLetra')
+        .populate('barrio', 'nombre')
+        .populate('perfilEsquema', 'codEsquema calzada urlImgEsq')
+        .populate('obs1', 'txtObs')
+        .populate('obs2', 'txtObs')
+        .populate('obs3', 'txtObs')
+        .populate('obs4', 'txtObs')
+        .populate('obs5', 'txtObs')
+        .populate('obs6', 'txtObs');
+        
 }
 
 async function create(data, creadoPor) {
@@ -82,7 +90,6 @@ async function create(data, creadoPor) {
 }
 
 async function update(id, data, modificadoPor) {
-    // Recalcular campos automáticos si cambian medidas
     if (data.anchoTotalPerfil !== undefined || data.tipoVia) {
         data.anchoTotalPerfil = calcularAnchoTotal(data);
         data.clasNacional     = calcularClasNacional(data.anchoTotalPerfil);
@@ -90,7 +97,8 @@ async function update(id, data, modificadoPor) {
     }
     data.modificadoPor     = modificadoPor;
     data.fechaModificacion = new Date();
-    data.logUltimaMod      = JSON.stringify(data);
+    // Solo guardar un resumen liviano, no el JSON completo
+    data.logUltimaMod = `Actualizado por ${modificadoPor} el ${new Date().toISOString()}`;
 
     return await ViaTramo.findByIdAndUpdate(id, data, { new: true });
 }

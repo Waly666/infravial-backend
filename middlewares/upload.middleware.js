@@ -10,8 +10,9 @@ function getStorage(carpeta) {
             cb(null, dir);
         },
         filename: (req, file, cb) => {
-            const ext      = path.extname(file.originalname);
-            const nombre   = `${carpeta}_${Date.now()}${ext}`;
+            const ext    = path.extname(file.originalname);
+            const folder = carpeta.replace('/', '_'); // ← evitar barra en nombre
+            const nombre = `${folder}_${Date.now()}${ext}`;
             cb(null, nombre);
         }
     });
