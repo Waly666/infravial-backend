@@ -10,34 +10,38 @@ const existSenVertSchema = new mongoose.Schema({
         coordinates: { type: [Number] }
     },
 
-    codSe:        { type: String, ref: 'SenVert' },
-    estado:       { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    matPlaca:     { type: String, enum: ['Poliester reforzado', 'Acero galvanizado', 'Aluminio', 'Material Flexible', 'Otro'] },
-    ubicEspacial: { type: String, enum: ['A nivel', 'Elevada'] },
+    codSe:        { type: String },
+    estado:       { type: String },
+    matPlaca:     { type: String },
+    ubicEspacial: { type: String },
     obstruccion:  { type: String },
     fechaInst:    { type: Date },
-    forma:        { type: String, enum: ['Circular', 'Octogonal', 'Rectangular', 'Cuadrangular', 'Romboidal', 'Triangular', 'Casa', 'Cruz', 'Escudo', 'Combinacion'] },
-    orientacion:  { type: String, enum: ['Optima', 'Deficiente', 'N/A'] },
-    reflecOptima: { type: String, enum: ['si', 'no', 'N/A'] },
+    forma:        { type: String },
+    orientacion:  { type: String },
+    reflecOptima: { type: String },
     dimTablero:   { type: String },
-    ubicPerVial:  { type: String, enum: ['Izquierda', 'Derecha', 'Sobre la calzada', 'En el Separador'] },
-    fase:         { type: String, enum: ['Inventario', 'Programación', 'Diseño', 'Por definir'] },
+    ubicPerVial:  { type: String },
+    fase:         { type: String },
     accion:       { type: String },
     ubicLateral:  { type: Number },
-    diagUbicLat:  { type: String, enum: ['Optima', 'Regular', 'Mala', 'N/A'] },
+    diagUbicLat:  { type: String },
     altura:       { type: Number },
-    diagAltura:   { type: String, enum: ['Optima', 'Regular', 'Mala', 'N/A'] },
-    banderas:     { type: String, enum: ['Dirección', 'Confirmación', 'Preseñalización', 'N/A'] },
+    diagAltura:   { type: String },
+    banderas:     { type: String },
     leyendas:     { type: String },
 
     // Fallas como array
-    fallas: [{ type: String, enum: ['Desgaste', 'Desproporción de tablero', 'Oxidación', 'Paral doblado', 'Tablero doblado', 'Elementos ajenos', 'Vandalizada', 'N/A'] }],
+    falla1: { type: String },
+    falla2: { type: String },
+    falla3: { type: String },
+    falla4: { type: String },
+    falla5: { type: String },
 
     // Diagnóstico soporte
     tipoSoporte:   { type: String },
-    sistemaSoporte:{ type: String, enum: ['Tipo H', 'Duplex', 'Movil', 'Poste abatible', 'Elevado', 'Simple', 'Poste en angulo de hierro'] },
-    estadoSoporte: { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoAnclaje: { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
+    sistemaSoporte:{ type: String },
+    estadoSoporte: { type: String },
+    estadoAnclaje: { type: String },
 
     // Observaciones (ref a ObservacionSV)
     notas: { type: String },
@@ -46,6 +50,7 @@ const existSenVertSchema = new mongoose.Schema({
     obs3:  { type: mongoose.Schema.Types.ObjectId, ref: 'ObservacionSV' },
     obs4:  { type: mongoose.Schema.Types.ObjectId, ref: 'ObservacionSV' },
     obs5:  { type: mongoose.Schema.Types.ObjectId, ref: 'ObservacionSV' },
+    urlFotoSenVert: { type: String },
 
     // Auditoría
     creadoPor:         { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
