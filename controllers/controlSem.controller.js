@@ -45,5 +45,13 @@ async function remove(req, res) {
         res.status(500).json({ message: err.message });
     }
 }
+async function getByTramo(req, res) {
+    try {
+        const registro = await controlSemService.getByTramo(req.params.idViaTramo);
+        res.json({ message: 'Control Semafórico INFRAVIAL', registro });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+module.exports = { getAll, getById, getByTramo, create, update, remove };
 
-module.exports = { getAll, getById, create, update, remove };

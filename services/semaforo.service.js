@@ -2,19 +2,32 @@ const Semaforo = require('../models/Semaforo');
 
 async function getAll(filtros = {}) {
     return await Semaforo.find(filtros)
-        .populate('idJornada', 'municipio fechaJornada')
-        .populate('idViaTramo', 'via nomenclatura')
-        .populate('obs1').populate('obs2').populate('obs3')
-        .populate('obs4').populate('obs5').populate('obs6')
+        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate('idControSem', 'numExterno tipoControlador')
+        .populate('obs1', 'textoObs')
+        .populate('obs2', 'textoObs')
+        .populate('obs3', 'textoObs')
+        .populate('obs4', 'textoObs')
+        .populate('obs5', 'textoObs')
+        .populate('obs6', 'textoObs')
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await Semaforo.findById(id)
-        .populate('idJornada').populate('idViaTramo')
-        .populate('idControSem')
-        .populate('obs1').populate('obs2').populate('obs3')
-        .populate('obs4').populate('obs5').populate('obs6');
+        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate('idControSem', 'numExterno tipoControlador')
+        .populate('obs1', 'textoObs')
+        .populate('obs2', 'textoObs')
+        .populate('obs3', 'textoObs')
+        .populate('obs4', 'textoObs')
+        .populate('obs5', 'textoObs')
+        .populate('obs6', 'textoObs');
+}
+
+async function getByControl(idControSem) {
+    return await Semaforo.find({ idControSem })
+        .populate('idViaTramo', 'via nomenclatura');
 }
 
 async function create(data, creadoPor) {
@@ -28,7 +41,7 @@ async function create(data, creadoPor) {
 async function update(id, data, modificadoPor) {
     data.modificadoPor     = modificadoPor;
     data.fechaModificacion = new Date();
-    data.logUltimaMod      = JSON.stringify(data);
+    data.logUltimaMod      = `Actualizado por ${modificadoPor} el ${new Date().toISOString()}`;
     return await Semaforo.findByIdAndUpdate(id, data, { new: true });
 }
 
@@ -36,4 +49,4 @@ async function remove(id) {
     return await Semaforo.findByIdAndDelete(id);
 }
 
-module.exports = { getAll, getById, create, update, remove };
+module.exports = { getAll, getById, getByControl, create, update, remove };
