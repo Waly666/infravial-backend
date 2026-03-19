@@ -9,5 +9,7 @@ router.get('/:id',    authenticateToken,                                        
 router.post('/',      authenticateToken, hasRole('admin','supervisor','encuestador'), checkJornada, controller.create);
 router.put('/:id',    authenticateToken, hasRole('admin','supervisor','encuestador'), checkJornada, controller.update);
 router.delete('/:id', authenticateToken, hasRole('admin','supervisor'),               controller.remove);
+router.put('/:id/fotos', authenticateToken, hasRole('admin','supervisor','encuestador'), controller.update);
+router.put('/:id/caras', authenticateToken, controller.updateCaras);
 
 module.exports = router;

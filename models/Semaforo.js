@@ -1,27 +1,28 @@
 const mongoose = require('mongoose');
 
 const caraSchema = new mongoose.Schema({
-    tipoModulo:      { type: String, enum: ['Led', 'Bombilla Incandescente'] },
+    tipoModulo:      { type: String},
     diametroLente:   { type: String, enum: ['30 cms', '20 cms'] },
     numeroModulos:   { type: Number },
     numeroVisceras:  { type: Number },
-    estadoMod1:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoViscera1:  { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoMod2:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoViscera2:  { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoMod3:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoViscera3:  { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoMod4:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    estadoViscera4:  { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
-    despliegue:      { type: String, enum: ['Vertical', 'Horizontal'] },
-    estadoCara:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
+    estadoMod1:      { type: String},
+    estadoViscera1:  { type: String},
+    estadoMod2:      { type: String},
+    estadoViscera2:  { type: String},
+    estadoMod3:      { type: String},
+    estadoViscera3:  { type: String},
+    estadoMod4:      { type: String},
+    estadoViscera4:  { type: String},
+    despliegue:      { type: String},
+    estadoCara:      { type: String},
     colores:         { type: String },
     placaContraste:  { type: Boolean },
-    estadoPlacaCont: { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
+    estadoPlacaCont: { type: String},
     danos:           [{ type: String }],
     flechaDir:       { type: Boolean },
     obs:             { type: String },
     urlFoto:         { type: String }
+    
 }, { _id: false });
 
 const sensorSchema = new mongoose.Schema({
@@ -58,7 +59,7 @@ const semaforoSchema = new mongoose.Schema({
     temporizador:       { type: Boolean },
     estadoTemp:         { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
     dispositivoAuditivo:{ type: Boolean },
-    estadoDispAud:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
+    estadoDispAud:      { type: String},
     tipoSoporte:        { type: String },
     estadoSoporte:      { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
     pinturaSoporte:     { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
