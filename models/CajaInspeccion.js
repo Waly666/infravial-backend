@@ -15,6 +15,7 @@ const cajaInspeccionSchema = new mongoose.Schema({
     tapa:             { type: Boolean },
     estadoTapa:       { type: String, enum: ['Bueno', 'Regular', 'Malo', 'No existe tapa'] },
     notas:            { type: String },
+    urlFotoCaja:      { type: String },
     creadoPor:        { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     fechaCreacion:    { type: Date, default: Date.now },
     modificadoPor:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

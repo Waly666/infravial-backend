@@ -2,14 +2,13 @@ const CajaInspeccion = require('../models/CajaInspeccion');
 
 async function getAll(filtros = {}) {
     return await CajaInspeccion.find(filtros)
-        .populate('idJornada', 'municipio fechaJornada')
-        .populate('idViaTramo', 'via nomenclatura')
+        .populate('idViaTramo', 'via nomenclatura municipio')
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await CajaInspeccion.findById(id)
-        .populate('idJornada').populate('idViaTramo');
+        .populate('idViaTramo', 'via nomenclatura municipio');
 }
 
 async function create(data, creadoPor) {
@@ -23,7 +22,7 @@ async function create(data, creadoPor) {
 async function update(id, data, modificadoPor) {
     data.modificadoPor     = modificadoPor;
     data.fechaModificacion = new Date();
-    data.logUltimaMod      = JSON.stringify(data);
+    data.logUltimaMod      = `Actualizado por ${modificadoPor} el ${new Date().toISOString()}`;
     return await CajaInspeccion.findByIdAndUpdate(id, data, { new: true });
 }
 
