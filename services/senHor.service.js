@@ -2,20 +2,25 @@ const ExistSenHor = require('../models/ExistSenHor');
 
 async function getAll(filtros = {}) {
     return await ExistSenHor.find(filtros)
-        .populate('idJornada', 'municipio fechaJornada')
-        .populate('idViaTramo', 'via nomenclatura')
-        .populate('ubicResTramo')
-        .populate('obs1').populate('obs2').populate('obs3')
-        .populate('obs4').populate('obs5').populate('obs6')
+        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate('obs1', 'obsSH')
+        .populate('obs2', 'obsSH')
+        .populate('obs3', 'obsSH')
+        .populate('obs4', 'obsSH')
+        .populate('obs5', 'obsSH')
+        .populate('obs6', 'obsSH')
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await ExistSenHor.findById(id)
-        .populate('idJornada').populate('idViaTramo')
-        .populate('ubicResTramo')
-        .populate('obs1').populate('obs2').populate('obs3')
-        .populate('obs4').populate('obs5').populate('obs6');
+        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate('obs1', 'obsSH')
+        .populate('obs2', 'obsSH')
+        .populate('obs3', 'obsSH')
+        .populate('obs4', 'obsSH')
+        .populate('obs5', 'obsSH')
+        .populate('obs6', 'obsSH');
 }
 
 async function create(data, creadoPor) {
@@ -29,7 +34,7 @@ async function create(data, creadoPor) {
 async function update(id, data, modificadoPor) {
     data.modificadoPor     = modificadoPor;
     data.fechaModificacion = new Date();
-    data.logUltimaMod      = JSON.stringify(data);
+    data.logUltimaMod      = `Actualizado por ${modificadoPor} el ${new Date().toISOString()}`;
     return await ExistSenHor.findByIdAndUpdate(id, data, { new: true });
 }
 
