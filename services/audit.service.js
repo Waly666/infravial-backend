@@ -8,7 +8,10 @@ async function getAll(filtros = {}) {
 }
 
 async function getByUser(userId) {
-    return await Audit.find({ user: userId }).sort({ fecha: -1 }).limit(100);
+    return await Audit.find({ user: userId })
+        .populate('user', 'nombres apellidos user')
+        .sort({ fecha: -1 })
+        .limit(100);
 }
 
 module.exports = { getAll, getByUser };
