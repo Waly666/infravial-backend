@@ -20,6 +20,7 @@ const catalogoRoutes     = require('./routes/catalogo.routes');
 const uploadRoutes       = require('./routes/upload.routes');
 const auditRoutes        = require('./routes/audit.routes');
 const dashboardRoutes    = require('./routes/dashboard.routes');
+const backupRoutes       = require('./routes/backup.routes');
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use('/catalogos',        catalogoRoutes);
 app.use('/upload',           uploadRoutes);
 app.use('/audit',            auditRoutes);
 app.use('/dashboard',        dashboardRoutes);
+app.use('/backups',          backupRoutes);
 
 // ── Conexión MongoDB ───────────────────────────────
 mongoose.connect(process.env.MONGO_URI)
