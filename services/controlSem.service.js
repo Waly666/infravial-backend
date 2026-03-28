@@ -2,13 +2,21 @@ const ControlSemaforo = require('../models/ControlSemaforo');
 
 async function getAll(filtros = {}) {
     return await ControlSemaforo.find(filtros)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await ControlSemaforo.findById(id)
-        .populate('idViaTramo', 'via nomenclatura municipio');
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        });
 }
 
 async function getByTramo(idViaTramo) {

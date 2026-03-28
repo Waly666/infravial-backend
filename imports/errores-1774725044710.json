@@ -1,0 +1,37 @@
+[
+  {
+    "mod": "via",
+    "fila": 103,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "via",
+    "fila": 225,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "via",
+    "fila": 287,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "via",
+    "fila": 465,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "vert",
+    "fila": 250,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "vert",
+    "fila": 792,
+    "error": "Sin coordenadas"
+  },
+  {
+    "mod": "vert",
+    "fila": 793,
+    "error": "Sin coordenadas"
+  }
+]

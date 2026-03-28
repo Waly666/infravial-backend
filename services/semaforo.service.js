@@ -2,7 +2,11 @@ const Semaforo = require('../models/Semaforo');
 
 async function getAll(filtros = {}) {
     return await Semaforo.find(filtros)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .populate('idControSem', 'numExterno tipoControlador')
         .populate('obs1', 'textoObs')
         .populate('obs2', 'textoObs')
@@ -15,7 +19,11 @@ async function getAll(filtros = {}) {
 
 async function getById(id) {
     return await Semaforo.findById(id)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .populate('idControSem', 'numExterno tipoControlador')
         .populate('obs1', 'textoObs')
         .populate('obs2', 'textoObs')

@@ -25,7 +25,7 @@ const viaTramoSchema = new mongoose.Schema({
     departamento: { type: String },
     municipio:    { type: String },
     localidad:    { type: String },
-    tipoLocalidad:{ type: String, enum: ['Cabecera Municipal', 'Corregimiento', 'Inspección', 'Centro Poblado'] },
+    tipoLocalidad:{ type: String },
 
     // Geoespacial LineString
     ubicacion: {
@@ -43,11 +43,11 @@ const viaTramoSchema = new mongoose.Schema({
     zat:            { type: mongoose.Schema.Types.ObjectId, ref: 'Zat' },
     comuna:         { type: mongoose.Schema.Types.ObjectId, ref: 'Comuna' },
     barrio:         { type: mongoose.Schema.Types.ObjectId, ref: 'Barrio' },
-    ubiCicloRuta:   { type: String, enum: ['En el separador', 'En la calzada', 'Al lado del Anden', 'N/A'] },
+    ubiCicloRuta:   { type: String },
     sentidoCardinal:{ type: String },
-    tipoUbic:       { type: String, enum: ['Tramo', 'Puente vehicular', 'Puente peatonal', 'Deprimido', 'Elevado', 'Túnel'] },
-    calzada:        { type: String, enum: ['Una', 'Dos', 'Tres'] },
-    tipoVia:        { type: String, enum: ['Urbana', 'Rural'] },
+    tipoUbic:       { type: String },
+    calzada:        { type: String },
+    tipoVia:        { type: String },
     claseVia:       { type: String },
     perfilEsquema:  { type: mongoose.Schema.Types.ObjectId, ref: 'EsquemaPerfil' },
     nomenclatura:   { type: nomenclaturaSchema },
@@ -93,17 +93,17 @@ const viaTramoSchema = new mongoose.Schema({
     clasMunPbot:         { type: String },
 
     // Características
-    disenioGeometrico: { type: String, enum: ['Curva', 'Recta'] },
-    inclinacionVia:    { type: String, enum: ['Plano', 'Pendiente'] },
-    sentidoVial:       { type: String, enum: ['Unidireccional', 'Bidireccional', 'Sin_Definir'] },
+    disenioGeometrico: { type: String },
+    inclinacionVia:    { type: String },
+    sentidoVial:       { type: String },
     carriles:          { type: Number },
     capaRodadura:      { type: String },
-    estadoVia:         { type: String, enum: ['Bueno', 'Regular', 'Malo'] },
+    estadoVia:         { type: String },
     estadoVia2:        [{ type: String }], // selección múltiple
     condicionesVia:    { type: String },
     iluminacArtificial:{ type: Boolean },
-    estadoIluminacion: { type: String, enum: ['Bueno', 'Malo'] },
-    visibilidad:       { type: String, enum: ['Normal', 'Disminuida'] },
+    estadoIluminacion: { type: String },
+    visibilidad:       { type: String },
     visDisminuida:     { type: String },
 
     // Daños como array de subdocumentos
@@ -121,6 +121,9 @@ const viaTramoSchema = new mongoose.Schema({
     obs5: { type: mongoose.Schema.Types.ObjectId, ref: 'ObservacionVia' },
     obs6: { type: mongoose.Schema.Types.ObjectId, ref: 'ObservacionVia' },
     notas:{ type: String },
+
+    // Campo Access (solo importación)
+    idViaTramoAccess:  { type: String },
 
     // Auditoría
     creadoPor:         { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

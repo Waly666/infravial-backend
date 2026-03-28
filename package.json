@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "import:csv:api": "node scripts/importar-csv-api.js",
+    "import:csv:api:full": "node scripts/importar-csv-api.js --all",
+    "import:excel": "node scripts/importar-excel.js"
   },
   "keywords": [],
   "author": "",

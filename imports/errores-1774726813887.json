@@ -1,0 +1,17 @@
+[
+  {
+    "mod": "vert",
+    "fila": 1578,
+    "error": "Can't extract geo keys: { _id: ObjectId('69c82e84aabcde0434cf2d10'), idJornada: ObjectId('69c62f4309a691c06f8a5ac9'), idViaTramo: ObjectId('69c82e6aaabcde0434cf00bc'), ubicacion: { type: \"Point\", coordinates: [ -733.770002777778, 3.99771527777778 ] }, codSe: \"SR-30\", estado: \"Bueno\", matPlaca: \"Acero galvanizado\", obstruccion: \"N/A\", forma: \"Circular\", orientacion: \"Optima\", reflecOptima: \"Si\", dimTablero: \"60x60\", fase: \"Inventario\", accion: \"Mantenimiento\", ubicLateral: 0.5, altura: 2.2, banderas: \"false\", leyendas: \"false\", falla1: \"Desgaste\", falla2: \"Oxidación\", tipoSoporte: \"Poste en Angulo de hierro\", sistemaSoporte: \"Simple\", estadoSoporte: \"Bueno\", estadoAnclaje: \"Bueno\", notas: \"acumulacion de basura en la ubicación del paral\", creadoPor: ObjectId('69b870dd961b17576bb451b3'), fechaCreacion: new Date(1774726788300), __v: 0 }  Longitude/latitude is out of bounds, lng: -733.77 lat: 3.99772"
+  },
+  {
+    "mod": "vert",
+    "fila": 1771,
+    "error": "Can't extract geo keys: { _id: ObjectId('69c82e85aabcde0434cf3014'), idJornada: ObjectId('69c62f4309a691c06f8a5ac9'), idViaTramo: ObjectId('69c82e6aaabcde0434cf00bc'), ubicacion: { type: \"Point\", coordinates: [ -734.724166666667, 8.23805555555556 ] }, codSe: \"SR-30\", estado: \"Bueno\", matPlaca: \"Acero galvanizado\", obstruccion: \"N/A\", forma: \"Circular\", orientacion: \"Optima\", reflecOptima: \"Si\", dimTablero: \"60x60\", fase: \"Inventario\", accion: \"Mantenimiento\", ubicLateral: 0.5, altura: 2.2, banderas: \"false\", leyendas: \"false\", falla1: \"Desgaste\", falla2: \"Oxidación\", tipoSoporte: \"Poste en Angulo de hierro\", sistemaSoporte: \"Simple\", estadoSoporte: \"Bueno\", estadoAnclaje: \"Bueno\", creadoPor: ObjectId('69b870dd961b17576bb451b3'), fechaCreacion: new Date(1774726789374), __v: 0 }  Longitude/latitude is out of bounds, lng: -734.724 lat: 8.23806"
+  },
+  {
+    "mod": "vert",
+    "fila": 1781,
+    "error": "Can't extract geo keys: { _id: ObjectId('69c82e85aabcde0434cf303c'), idJornada: ObjectId('69c62f4309a691c06f8a5ac9'), idViaTramo: ObjectId('69c82e6aaabcde0434cf00bc'), ubicacion: { type: \"Point\", coordinates: [ -734.359444444444, 9.706666666666671 ] }, codSe: \"SRC-03\", estado: \"Bueno\", matPlaca: \"Acero galvanizado\", obstruccion: \"Árboles\", forma: \"Circular\", orientacion: \"Optima\", reflecOptima: \"Si\", dimTablero: \"45x45\", fase: \"Inventario\", accion: \"Ninguno\", ubicLateral: 0.6, altura: 2.2, banderas: \"false\", leyendas: \"false\", falla1: \"N/A\", tipoSoporte: \"Tubo galvanizado\", sistemaSoporte: \"Simple\", estadoSoporte: \"Bueno\", estadoAnclaje: \"Bueno\", creadoPor: ObjectId('69b870dd961b17576bb451b3'), fechaCreacion: new Date(1774726789387), __v: 0 }  Longitude/latitude is out of bounds, lng: -734.359 lat: 9.70667"
+  }
+]

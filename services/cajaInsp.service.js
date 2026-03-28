@@ -2,13 +2,21 @@ const CajaInspeccion = require('../models/CajaInspeccion');
 
 async function getAll(filtros = {}) {
     return await CajaInspeccion.find(filtros)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .sort({ fechaCreacion: -1 });
 }
 
 async function getById(id) {
     return await CajaInspeccion.findById(id)
-        .populate('idViaTramo', 'via nomenclatura municipio');
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        });
 }
 
 async function create(data, creadoPor) {

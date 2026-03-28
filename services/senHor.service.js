@@ -2,7 +2,11 @@ const ExistSenHor = require('../models/ExistSenHor');
 
 async function getAll(filtros = {}) {
     return await ExistSenHor.find(filtros)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .populate('obs1', 'obsSH')
         .populate('obs2', 'obsSH')
         .populate('obs3', 'obsSH')
@@ -14,7 +18,11 @@ async function getAll(filtros = {}) {
 
 async function getById(id) {
     return await ExistSenHor.findById(id)
-        .populate('idViaTramo', 'via nomenclatura municipio')
+        .populate({
+            path: 'idViaTramo',
+            select: 'via nomenclatura municipio departamento zat',
+            populate: { path: 'zat', select: 'zatNumero zatLetra' }
+        })
         .populate('obs1', 'obsSH')
         .populate('obs2', 'obsSH')
         .populate('obs3', 'obsSH')
