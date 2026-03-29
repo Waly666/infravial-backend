@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const backupEventSchema = new mongoose.Schema({
-    tipo: { type: String, enum: ['backup', 'restore'], required: true },
+    tipo: { type: String, enum: ['backup', 'restore', 'purge'], required: true },
     estado: { type: String, enum: ['success', 'error'], required: true },
     actor: { type: String, default: 'system' },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },

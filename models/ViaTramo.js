@@ -98,6 +98,8 @@ const viaTramoSchema = new mongoose.Schema({
     sentidoVial:       { type: String },
     carriles:          { type: Number },
     capaRodadura:      { type: String },
+    fase:              { type: String },
+    accion:            { type: String },
     estadoVia:         { type: String },
     estadoVia2:        [{ type: String }], // selección múltiple
     condicionesVia:    { type: String },

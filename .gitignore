@@ -4,3 +4,6 @@ logs/
 uploads/
 "data/"
 
+# ZIPs de backup completo superan el límite de GitHub (100 MB)
+backups/*.zip
+

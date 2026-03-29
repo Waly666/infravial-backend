@@ -1,0 +1,27 @@
+/**
+ * Carga todos los modelos Mongoose (para utilidades como purge/backup que resuelven nombres de colección).
+ */
+require('./User');
+require('./ViaTramo');
+require('./ExistSenVert');
+require('./ExistSenHor');
+require('./Semaforo');
+require('./ControlSemaforo');
+require('./CajaInspeccion');
+require('./ObservacionSV');
+require('./ObservacionSH');
+require('./ObsSemaforo');
+require('./ObservacionVia');
+require('./PreguntaEncVia');
+require('./RespuestaEncVia');
+require('./SenVert');
+require('./EsquemaPerfil');
+require('./UbicSenHor');
+require('./Demarcacion');
+require('./Zat');
+require('./Comuna');
+require('./Barrio');
+require('./Jornada');
+require('./Divipol');
+require('./Audit');
+require('./BackupEvent');

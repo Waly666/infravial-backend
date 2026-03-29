@@ -1,4 +1,33 @@
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const multer = require('multer');
 const backupService = require('../services/backup.service');
+
+const uploadRestore = multer({
+    storage: multer.diskStorage({
+        destination: (_req, _file, cb) => {
+            const dir = path.join(os.tmpdir(), 'infravial-restore-incoming');
+            fs.mkdirSync(dir, { recursive: true });
+            cb(null, dir);
+        },
+        filename: (_req, file, cb) => {
+            const base = path
+                .basename(file.originalname || 'backup')
+                .replace(/[^\w.\-]/g, '_');
+            cb(null, `restore-${Date.now()}-${base}`);
+        }
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        const n = (file.originalname || '').toLowerCase();
+        if (n.endsWith('.zip') || n.endsWith('.gz') || n.endsWith('.json.gz')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo archivos .zip (completo) o .json.gz (solo base de datos)'));
+        }
+    }
+});
 
 async function createBackup(req, res) {
     try {
@@ -31,4 +60,65 @@ async function restoreBackup(req, res) {
     }
 }
 
-module.exports = { createBackup, listBackups, restoreBackup };
+function downloadBackup(req, res) {
+    try {
+        const raw = req.params.archivo || '';
+        const { filePath, fileName } = backupService.getBackupDownloadPath(raw);
+        res.download(path.resolve(filePath), fileName, (err) => {
+            if (err && !res.headersSent) {
+                res.status(500).json({ message: err.message || 'Error al descargar' });
+            }
+        });
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
+async function restoreBackupUpload(req, res) {
+    try {
+        if (!req.file?.path) {
+            return res.status(400).json({ message: 'Adjunta un archivo .zip o .json.gz' });
+        }
+        const actor = req.user?.user || req.user?.rol || 'admin';
+        const result = await backupService.restoreFromUploadDiskPath(
+            req.file.path,
+            req.file.originalname,
+            actor,
+            req.user?.id || null
+        );
+        res.json({ message: 'Restore aplicado correctamente', restore: result });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
+async function purgeDatabase(req, res) {
+    try {
+        const { grupos, confirmacion } = req.body || {};
+        if (confirmacion !== 'BORRAR') {
+            return res
+                .status(400)
+                .json({ message: 'Escribe la palabra BORRAR en mayusculas para confirmar.' });
+        }
+        const actor = req.user?.user || req.user?.rol || 'admin';
+        const result = await backupService.purgeCollections(
+            grupos,
+            req.user?.id,
+            actor,
+            req.user?.id || null
+        );
+        res.json({ message: 'Purge aplicado', purge: result });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
+module.exports = {
+    createBackup,
+    listBackups,
+    restoreBackup,
+    downloadBackup,
+    restoreBackupUpload,
+    purgeDatabase,
+    uploadRestore
+};
