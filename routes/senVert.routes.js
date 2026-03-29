@@ -4,6 +4,7 @@ const controller = require('../controllers/senVert.controller');
 const { authenticateToken, hasRole } = require('../middlewares/auth.middleware');
 const { checkJornada } = require('../middlewares/jornada.middleware');
 
+router.get('/estadisticas', authenticateToken, hasRole('admin', 'supervisor'), controller.getEstadisticas);
 router.get('/',       authenticateToken,                                              controller.getAll);
 router.get('/:id',    authenticateToken,                                              controller.getById);
 router.post('/',      authenticateToken, hasRole('admin','supervisor','encuestador'), checkJornada, controller.create);

@@ -1,4 +1,14 @@
 const senHorService = require('../services/senHor.service');
+const existSenHorEstadisticas = require('../services/existSenHor.estadisticas.service');
+
+async function getEstadisticas(req, res) {
+    try {
+        const data = await existSenHorEstadisticas.getEstadisticas(req.query);
+        res.json({ message: 'Estadísticas señales horizontales', ...data });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
 
 async function getAll(req, res) {
     try {
@@ -46,4 +56,4 @@ async function remove(req, res) {
     }
 }
 
-module.exports = { getAll, getById, create, update, remove };
+module.exports = { getEstadisticas, getAll, getById, create, update, remove };
