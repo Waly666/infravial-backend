@@ -1,51 +1,93 @@
-const ViaTramo       = require('../models/ViaTramo');
-const ExistSenVert   = require('../models/ExistSenVert');
-const ExistSenHor    = require('../models/ExistSenHor');
-const Semaforo       = require('../models/Semaforo');
-const Jornada        = require('../models/Jornada');
-const CajaInspeccion = require('../models/CajaInspeccion');
+const ViaTramo         = require('../models/ViaTramo');
+const ExistSenVert     = require('../models/ExistSenVert');
+const ExistSenHor      = require('../models/ExistSenHor');
+const Semaforo         = require('../models/Semaforo');
+const ControlSemaforo  = require('../models/ControlSemaforo');
+const Jornada          = require('../models/Jornada');
+const CajaInspeccion   = require('../models/CajaInspeccion');
 
-async function getStats() {
-    const desdeMeses = new Date();
-    desdeMeses.setMonth(desdeMeses.getMonth() - 5);
-    desdeMeses.setDate(1);
-    desdeMeses.setHours(0, 0, 0, 0);
+function groupBy(Model, field, match) {
+    const pipeline = [];
+    if (match) pipeline.push({ $match: match });
+    pipeline.push(
+        { $group: { _id: `$${field}`, total: { $sum: 1 } } },
+        { $sort: { total: -1 } }
+    );
+    return Model.aggregate(pipeline);
+}
+
+async function getStats(filters = {}) {
+    const { departamento, municipio } = filters;
+
+    const tramoMatch = {};
+    if (departamento) tramoMatch.departamento = departamento;
+    if (municipio) tramoMatch.municipio = municipio;
+    const hasGeoFilter = Object.keys(tramoMatch).length > 0;
+
+    let relMatch = {};
+    if (hasGeoFilter) {
+        const tramoIds = await ViaTramo.find(tramoMatch).distinct('_id');
+        relMatch = { idViaTramo: { $in: tramoIds } };
+    }
+
+    const tramoFilter = hasGeoFilter ? tramoMatch : {};
 
     const [
         totalTramos,
         totalSenVert,
         totalSenHor,
         totalSemaforos,
+        totalControlSem,
         totalCajasInsp,
         jornadaActiva,
         senVertEstados,
         senHorEstados,
         semaforosEstados,
-        tramosPorMes,
-        ultimosTramos
+        ultimosTramos,
+        tramosPorEstadoVia,
+        tramosPorFase,
+        tramosPorAccion,
+        senVertFases,
+        senVertAcciones,
+        senHorFases,
+        senHorAcciones,
+        semaforosFases,
+        semaforosAcciones,
+        controlSemPorEstadoCtrl,
+        controlSemFases,
+        controlSemAcciones,
+        departamentos,
+        municipios
     ] = await Promise.all([
-        ViaTramo.countDocuments(),
-        ExistSenVert.countDocuments(),
-        ExistSenHor.countDocuments(),
-        Semaforo.countDocuments(),
-        CajaInspeccion.countDocuments(),
+        ViaTramo.countDocuments(tramoFilter),
+        ExistSenVert.countDocuments(relMatch),
+        ExistSenHor.countDocuments(relMatch),
+        Semaforo.countDocuments(relMatch),
+        ControlSemaforo.countDocuments(relMatch),
+        CajaInspeccion.countDocuments(relMatch),
         Jornada.findOne({ estado: 'EN PROCESO' }),
-        ExistSenVert.aggregate([{ $group: { _id: '$estado', total: { $sum: 1 } } }]),
-        ExistSenHor.aggregate([{ $group: { _id: '$estadoDem', total: { $sum: 1 } } }]),
-        Semaforo.aggregate([{ $group: { _id: '$estadoGenPint', total: { $sum: 1 } } }]),
-        ViaTramo.aggregate([
-            { $match: { fechaCreacion: { $gte: desdeMeses } } },
-            {
-                $group: {
-                    _id: { $dateToString: { format: '%Y-%m', date: '$fechaCreacion' } },
-                    total: { $sum: 1 }
-                }
-            },
-            { $sort: { _id: 1 } }
-        ]),
-        ViaTramo.find().sort({ fechaCreacion: -1 }).limit(5)
+        groupBy(ExistSenVert, 'estado', hasGeoFilter ? relMatch : null),
+        groupBy(ExistSenHor, 'estadoDem', hasGeoFilter ? relMatch : null),
+        groupBy(Semaforo, 'estadoGenPint', hasGeoFilter ? relMatch : null),
+        ViaTramo.find(tramoFilter).sort({ fechaCreacion: -1 }).limit(5)
             .populate('idJornada', 'municipio')
-            .select('via municipio fechaCreacion')
+            .select('via municipio fechaCreacion'),
+        groupBy(ViaTramo, 'estadoVia', hasGeoFilter ? tramoFilter : null),
+        groupBy(ViaTramo, 'fase', hasGeoFilter ? tramoFilter : null),
+        groupBy(ViaTramo, 'accion', hasGeoFilter ? tramoFilter : null),
+        groupBy(ExistSenVert, 'fase', hasGeoFilter ? relMatch : null),
+        groupBy(ExistSenVert, 'accion', hasGeoFilter ? relMatch : null),
+        groupBy(ExistSenHor, 'fase', hasGeoFilter ? relMatch : null),
+        groupBy(ExistSenHor, 'accion', hasGeoFilter ? relMatch : null),
+        groupBy(Semaforo, 'fase', hasGeoFilter ? relMatch : null),
+        groupBy(Semaforo, 'accion', hasGeoFilter ? relMatch : null),
+        groupBy(ControlSemaforo, 'estadoControlador', hasGeoFilter ? relMatch : null),
+        groupBy(ControlSemaforo, 'fase', hasGeoFilter ? relMatch : null),
+        groupBy(ControlSemaforo, 'accion', hasGeoFilter ? relMatch : null),
+        ViaTramo.distinct('departamento'),
+        departamento
+            ? ViaTramo.distinct('municipio', { departamento })
+            : ViaTramo.distinct('municipio')
     ]);
 
     return {
@@ -53,13 +95,27 @@ async function getStats() {
         totalSenVert,
         totalSenHor,
         totalSemaforos,
+        totalControlSem,
         totalCajasInsp,
         jornadaActiva,
         senVertEstados,
         senHorEstados,
         semaforosEstados,
-        tramosPorMes,
-        ultimosTramos
+        ultimosTramos,
+        tramosPorEstadoVia,
+        tramosPorFase,
+        tramosPorAccion,
+        senVertFases,
+        senVertAcciones,
+        senHorFases,
+        senHorAcciones,
+        semaforosFases,
+        semaforosAcciones,
+        controlSemPorEstadoCtrl,
+        controlSemFases,
+        controlSemAcciones,
+        departamentos: departamentos.filter(Boolean).sort(),
+        municipios: municipios.filter(Boolean).sort()
     };
 }
 
