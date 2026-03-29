@@ -205,8 +205,6 @@ async function getEstadisticas(query) {
     const total = await ViaTramo.countDocuments(match);
 
     const [
-        fase,
-        accion,
         estadoVia,
         clasPorCompetencia,
         clasPorFuncionalidad,
@@ -231,8 +229,6 @@ async function getEstadisticas(query) {
         zat,
         catalogos
     ] = await Promise.all([
-        groupByField(match, 'fase'),
-        groupByField(match, 'accion'),
         groupByField(match, 'estadoVia'),
         groupByField(match, 'clasPorCompetencia'),
         groupByField(match, 'clasPorFuncionalidad'),
@@ -260,14 +256,10 @@ async function getEstadisticas(query) {
 
     const secciones = [
         seccion(
-            'gestion-inventario',
-            'Gestión del inventario',
-            'Fase, acción y estado general del tramo.',
-            [
-                bloque('fase', 'Fase', 'fase', fase, total),
-                bloque('accion', 'Acción', 'accion', accion, total),
-                bloque('estadoVia', 'Estado de vía', 'estadoVia', estadoVia, total)
-            ]
+            'estado-via-general',
+            'Estado de vía',
+            'Distribución según el campo estado de vía del tramo.',
+            [bloque('estadoVia', 'Estado de vía', 'estadoVia', estadoVia, total)]
         ),
         seccion(
             'clasificacion-vial',
