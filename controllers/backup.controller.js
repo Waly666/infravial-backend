@@ -1,14 +1,20 @@
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const multer = require('multer');
 const backupService = require('../services/backup.service');
+
+/** Misma base que backup.service (evita /tmp: en VPS a veces se borra o no persiste). */
+const BACKUP_DIR = process.env.BACKUP_DIR || path.join(__dirname, '../backups');
 
 const uploadRestore = multer({
     storage: multer.diskStorage({
         destination: (_req, _file, cb) => {
-            const dir = path.join(os.tmpdir(), 'infravial-restore-incoming');
-            fs.mkdirSync(dir, { recursive: true });
+            const dir = path.join(BACKUP_DIR, '.restore-incoming');
+            try {
+                fs.mkdirSync(dir, { recursive: true });
+            } catch (e) {
+                return cb(e);
+            }
             cb(null, dir);
         },
         filename: (_req, file, cb) => {
@@ -75,13 +81,20 @@ function downloadBackup(req, res) {
 }
 
 async function restoreBackupUpload(req, res) {
+    const tmpPath = req.file?.path;
     try {
-        if (!req.file?.path) {
+        if (!tmpPath) {
             return res.status(400).json({ message: 'Adjunta un archivo .zip o .json.gz' });
+        }
+        if (!fs.existsSync(tmpPath)) {
+            return res.status(400).json({
+                message:
+                    'No se encontró el archivo en el servidor tras la subida. Suele deberse a: límite de tamaño en Nginx (client_max_body_size), timeout de proxy, o disco lleno. Sube de nuevo o copia el ZIP a la carpeta backups del servidor y restaura por nombre (infravial-full-backup-….zip).'
+            });
         }
         const actor = req.user?.user || req.user?.rol || 'admin';
         const result = await backupService.restoreFromUploadDiskPath(
-            req.file.path,
+            tmpPath,
             req.file.originalname,
             actor,
             req.user?.id || null

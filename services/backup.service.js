@@ -367,8 +367,12 @@ async function restoreFromUploadDiskPath(filePath, originalName, actor, userId) 
             .basename(originalName || 'backup')
             .replace(/[^\w.\-]/g, '_');
 
+        /**
+         * Hay que await a restore/apply: si solo se hace `return restoreFromFullZipFile(...)`,
+         * el `finally` corre enseguida y borra el ZIP con unlink mientras unzipper aún lee el archivo → ENOENT / restore fallido.
+         */
         if (isZipBuffer(head)) {
-            return restoreFromFullZipFile(
+            return await restoreFromFullZipFile(
                 filePath,
                 base,
                 `(upload) ${base}`,
@@ -378,7 +382,7 @@ async function restoreFromUploadDiskPath(filePath, originalName, actor, userId) 
         }
         if (isGzipBuffer(head)) {
             const gz = fs.readFileSync(filePath);
-            return applyRestoreFromZippedBuffer(
+            return await applyRestoreFromZippedBuffer(
                 gz,
                 base.endsWith('.gz') ? base : `${base}.json.gz`,
                 `(upload) ${originalName}`,

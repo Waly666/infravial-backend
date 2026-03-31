@@ -127,7 +127,9 @@ Implementación: `services/viaTramo.estadisticas.service.js`, `services/existSen
 - **GET `/backups/logs`** — Historial (`BackupEvent`).
 - **GET `/backups/download/:archivo`** — Descarga `.zip` o legado `.json.gz` del directorio de backups.
 - **POST `/backups/restore`** — Body `{ "archivo": "nombre-en-servidor" }`. Si es `.zip`, restaura BD y **reemplaza** `uploads/`. Si es `.json.gz` antiguo, solo BD.
-- **POST `/backups/restore-upload`** — `multipart/form-data`, campo **`file`**: `.zip` o `.json.gz` (archivo en disco temporal, límite configurable en controller).
+- **POST `/backups/restore-upload`** — `multipart/form-data`, campo **`file`**: `.zip` o `.json.gz`. El archivo se guarda bajo **`BACKUP_DIR/.restore-incoming/`** (no en `/tmp`). **Importante:** la restauración ZIP debe **esperar** a terminar el unzip antes de borrar el temporal; si no, aparece `ENOENT` al leer el `.zip`.
+- **Docker Compose:** montar **`./backend/backups:/app/backups`** en el servicio del API para que los ZIP generados/descargados/restaurados persistan en el host.
+- En Nginx: `client_max_body_size` mayor que el ZIP y timeouts de proxy altos en la ruta del API.
 - **POST `/backups/purge`** — Limpieza por grupos + confirmación `BORRAR` (ver implementación en `backup.service.js`).
 
 ---
