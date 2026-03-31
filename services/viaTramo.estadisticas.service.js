@@ -214,6 +214,9 @@ async function getEstadisticas(query) {
         tipoVia,
         claseVia,
         tipoLocalidad,
+        tipoUbic,
+        sector,
+        zona,
         disenioGeometrico,
         inclinacionVia,
         sentidoVial,
@@ -238,6 +241,9 @@ async function getEstadisticas(query) {
         groupByField(match, 'tipoVia'),
         groupByField(match, 'claseVia'),
         groupByField(match, 'tipoLocalidad'),
+        groupByField(match, 'tipoUbic'),
+        groupByField(match, 'sector'),
+        groupByField(match, 'zona'),
         groupByField(match, 'disenioGeometrico'),
         groupByField(match, 'inclinacionVia'),
         groupByField(match, 'sentidoVial'),
@@ -276,11 +282,14 @@ async function getEstadisticas(query) {
         seccion(
             'tipo-jerarquia',
             'Tipo y jerarquía',
-            'Tipo de vía, clase y tipo de localidad.',
+            'Tipo de vía, sector, zona, clase, tipo de localidad y diseño (tipoUbic).',
             [
                 bloque('tipoVia', 'Tipo de vía', 'tipoVia', tipoVia, total),
+                bloque('sector', 'Sector', 'sector', sector, total),
+                bloque('zona', 'Zona', 'zona', zona, total),
                 bloque('claseVia', 'Clase de vía', 'claseVia', claseVia, total),
-                bloque('tipoLocalidad', 'Tipo de localidad', 'tipoLocalidad', tipoLocalidad, total)
+                bloque('tipoLocalidad', 'Tipo de localidad', 'tipoLocalidad', tipoLocalidad, total),
+                bloque('tipoUbic', 'Diseño', 'tipoUbic', tipoUbic, total)
             ]
         ),
         seccion(

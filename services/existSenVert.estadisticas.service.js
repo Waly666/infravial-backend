@@ -49,26 +49,6 @@ async function groupByField(match, field) {
     return rows.map((r) => ({ categoria: labelId(r._id), cantidad: r.total }));
 }
 
-async function groupByNumericField(match, field) {
-    const rows = await ExistSenVert.aggregate([
-        { $match: match },
-        {
-            $addFields: {
-                key: {
-                    $cond: [
-                        { $or: [{ $eq: [`$${field}`, null] }, { $not: [`$${field}`] }] },
-                        'Sin definir',
-                        { $toString: `$${field}` }
-                    ]
-                }
-            }
-        },
-        { $group: { _id: '$key', total: { $sum: 1 } } },
-        { $sort: { total: -1 } }
-    ]);
-    return rows.map((r) => ({ categoria: labelId(r._id), cantidad: r.total }));
-}
-
 function conPorcentajes(filas, total) {
     if (!total || total <= 0) return filas.map((f) => ({ ...f, porcentaje: 0 }));
     return filas.map((f) => ({
@@ -133,7 +113,6 @@ async function getEstadisticas(query) {
         forma,
         orientacion,
         reflecOptima,
-        dimTablero,
         ubicPerVial,
         fase,
         accion,
@@ -141,8 +120,6 @@ async function getEstadisticas(query) {
         diagAltura,
         banderas,
         leyendas,
-        ubicLateral,
-        altura,
         falla1,
         falla2,
         falla3,
@@ -161,7 +138,6 @@ async function getEstadisticas(query) {
         groupByField(match, 'forma'),
         groupByField(match, 'orientacion'),
         groupByField(match, 'reflecOptima'),
-        groupByField(match, 'dimTablero'),
         groupByField(match, 'ubicPerVial'),
         groupByField(match, 'fase'),
         groupByField(match, 'accion'),
@@ -169,8 +145,6 @@ async function getEstadisticas(query) {
         groupByField(match, 'diagAltura'),
         groupByField(match, 'banderas'),
         groupByField(match, 'leyendas'),
-        groupByNumericField(match, 'ubicLateral'),
-        groupByNumericField(match, 'altura'),
         groupByField(match, 'falla1'),
         groupByField(match, 'falla2'),
         groupByField(match, 'falla3'),
@@ -215,13 +189,10 @@ async function getEstadisticas(query) {
         ),
         seccion(
             'dimensiones',
-            'Dimensiones y diagnósticos',
-            'Tablero, lateral, altura y diagnósticos asociados.',
+            'Diagnósticos de instalación',
+            'Diagnósticos de ubicación lateral y de altura (sin valores numéricos de medida).',
             [
-                bloque('dimTablero', 'Dimensión tablero', 'dimTablero', dimTablero, total),
-                bloque('ubicLateral', 'Ubicación lateral (valor)', 'ubicLateral', ubicLateral, total),
                 bloque('diagUbicLat', 'Diagnóstico ubicación lateral', 'diagUbicLat', diagUbicLat, total),
-                bloque('altura', 'Altura (valor)', 'altura', altura, total),
                 bloque('diagAltura', 'Diagnóstico altura', 'diagAltura', diagAltura, total)
             ]
         ),

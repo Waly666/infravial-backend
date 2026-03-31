@@ -66,9 +66,14 @@ function mapSentido(v) {
     const x = s(v);
     if (!x) return undefined;
     const low = x.toLowerCase();
-    if (low.includes('doble') || low.includes('bidireccional')) return 'Bidireccional';
-    if (low.includes('un sentido') || low.includes('unidireccional') || low.includes('uni')) return 'Unidireccional';
-    if (low.includes('sin')) return 'Sin_Definir';
+    if (low.includes('reversible')) return 'Reversible';
+    if (low.includes('contraflujo') || low.includes('contra flujo')) return 'Contraflujo';
+    if (low.includes('ciclo') || low.includes('ciclov')) return 'Ciclo vía';
+    if (low.includes('doble') || low.includes('bidireccional')) return 'Doble Sentido';
+    if (low.includes('un sentido') || low.includes('unidireccional') || (low.includes('uni') && !low.includes('municip'))) {
+        return 'Un sentido';
+    }
+    if (low.includes('sin defin')) return 'Sin_Definir';
     return x;
 }
 
@@ -307,7 +312,7 @@ async function main() {
 
             const body = {
                 idJornada,
-                tipoUbic: 'Tramo',
+                tipoUbic: 'Tramo de Via',
                 fechaInv: excelDate(r[0])?.toISOString(),
                 departamento: s(r[1]),
                 municipio: mun,

@@ -180,9 +180,13 @@ function parseFechaInv(s) {
 
 function mapSentidoVial(v) {
     const x = normCell(v).toLowerCase();
-    if (x.includes('doble') || x.includes('bidireccional')) return 'Bidireccional';
-    if (x.includes('uni') || x.includes('un sentido')) return 'Unidireccional';
-    if (x.includes('sin')) return 'Sin_Definir';
+    if (!x) return undefined;
+    if (x.includes('reversible')) return 'Reversible';
+    if (x.includes('contraflujo') || x.includes('contra flujo')) return 'Contraflujo';
+    if (x.includes('ciclo') || x.includes('ciclov')) return 'Ciclo vía';
+    if (x.includes('doble') || x.includes('bidireccional')) return 'Doble Sentido';
+    if (x.includes('uni') || x.includes('un sentido')) return 'Un sentido';
+    if (x.includes('sin defin')) return 'Sin_Definir';
     return undefined;
 }
 

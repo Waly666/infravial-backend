@@ -1,5 +1,26 @@
 const mongoose = require('mongoose');
 
+/** Tramo: sector (después de tipo de vía en formulario) */
+const SECTORES_VIA_VALIDOS = ['Residencial', 'Industrial', 'Comercial'];
+
+/** Tramo: zona de influencia */
+const ZONAS_VIA_VALIDOS = ['Escolar', 'Deportiva', 'Turística', 'Privada', 'Militar', 'Hospitalaria'];
+
+/** Diseño / tipo de ubicación del tramo (etiqueta en formulario: "Diseño") */
+const TIPOS_UBIC_VALIDOS = [
+    'Glorieta',
+    'Interseccion',
+    'Paso A Nivel',
+    'Ponton',
+    'Cicloruta',
+    'Paso elevado',
+    'Paso Inferior',
+    'Peatonal',
+    'Puente',
+    'Tramo de Via',
+    'Tunel'
+];
+
 const danoSchema = new mongoose.Schema({
     dano:  { type: String },
     clase: { type: String },
@@ -45,9 +66,35 @@ const viaTramoSchema = new mongoose.Schema({
     barrio:         { type: mongoose.Schema.Types.ObjectId, ref: 'Barrio' },
     ubiCicloRuta:   { type: String },
     sentidoCardinal:{ type: String },
-    tipoUbic:       { type: String },
+    tipoUbic: {
+        type: String,
+        validate: {
+            validator(v) {
+                return v == null || v === '' || TIPOS_UBIC_VALIDOS.includes(v);
+            },
+            message: 'tipoUbic debe ser uno de los valores permitidos (Diseño)'
+        }
+    },
     calzada:        { type: String },
     tipoVia:        { type: String },
+    sector: {
+        type: String,
+        validate: {
+            validator(v) {
+                return v == null || v === '' || SECTORES_VIA_VALIDOS.includes(v);
+            },
+            message: 'sector debe ser Residencial, Industrial o Comercial'
+        }
+    },
+    zona: {
+        type: String,
+        validate: {
+            validator(v) {
+                return v == null || v === '' || ZONAS_VIA_VALIDOS.includes(v);
+            },
+            message: 'zona debe ser uno de los valores permitidos'
+        }
+    },
     claseVia:       { type: String },
     perfilEsquema:  { type: mongoose.Schema.Types.ObjectId, ref: 'EsquemaPerfil' },
     nomenclatura:   { type: nomenclaturaSchema },
@@ -95,6 +142,7 @@ const viaTramoSchema = new mongoose.Schema({
     // Características
     disenioGeometrico: { type: String },
     inclinacionVia:    { type: String },
+    /** Valores nuevos en UI; legado: Unidireccional, Bidireccional, Sin_Definir (sin enum para no invalidar históricos) */
     sentidoVial:       { type: String },
     carriles:          { type: Number },
     capaRodadura:      { type: String },
@@ -137,3 +185,6 @@ const viaTramoSchema = new mongoose.Schema({
 
 viaTramoSchema.index({ ubicacion: '2dsphere' });
 module.exports = mongoose.model('ViaTramo', viaTramoSchema);
+module.exports.TIPOS_UBIC_VALIDOS = TIPOS_UBIC_VALIDOS;
+module.exports.SECTORES_VIA_VALIDOS = SECTORES_VIA_VALIDOS;
+module.exports.ZONAS_VIA_VALIDOS = ZONAS_VIA_VALIDOS;

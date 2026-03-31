@@ -4,7 +4,7 @@ async function getAll(filtros = {}) {
     return await Semaforo.find(filtros)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         })
         .populate('idControSem', 'numExterno tipoControlador')
@@ -21,7 +21,7 @@ async function getById(id) {
     return await Semaforo.findById(id)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         })
         .populate('idControSem', 'numExterno tipoControlador')
@@ -35,7 +35,7 @@ async function getById(id) {
 
 async function getByControl(idControSem) {
     return await Semaforo.find({ idControSem })
-        .populate('idViaTramo', 'via nomenclatura');
+        .populate('idViaTramo', 'via nomenclatura tipoUbic');
 }
 
 async function create(data, creadoPor) {

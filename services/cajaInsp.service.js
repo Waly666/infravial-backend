@@ -4,7 +4,7 @@ async function getAll(filtros = {}) {
     return await CajaInspeccion.find(filtros)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         })
         .sort({ fechaCreacion: -1 });
@@ -14,7 +14,7 @@ async function getById(id) {
     return await CajaInspeccion.findById(id)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         });
 }

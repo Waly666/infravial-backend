@@ -71,7 +71,7 @@ async function getStats(filters = {}) {
         groupBy(Semaforo, 'estadoGenPint', hasGeoFilter ? relMatch : null),
         ViaTramo.find(tramoFilter).sort({ fechaCreacion: -1 }).limit(5)
             .populate('idJornada', 'municipio')
-            .select('via municipio fechaCreacion'),
+            .select('via municipio fechaCreacion tipoUbic'),
         groupBy(ViaTramo, 'estadoVia', hasGeoFilter ? tramoFilter : null),
         groupBy(ViaTramo, 'fase', hasGeoFilter ? tramoFilter : null),
         groupBy(ViaTramo, 'accion', hasGeoFilter ? tramoFilter : null),

@@ -9,7 +9,8 @@
     "dev": "nodemon server.js",
     "import:csv:api": "node scripts/importar-csv-api.js",
     "import:csv:api:full": "node scripts/importar-csv-api.js --all",
-    "import:excel": "node scripts/importar-excel.js"
+    "import:excel": "node scripts/importar-excel.js",
+    "migrate:tipo-ubic": "node scripts/migrate-tipoUbic-tramo-de-via.js"
   },
   "keywords": [],
   "author": "",

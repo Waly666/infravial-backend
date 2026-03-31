@@ -29,7 +29,7 @@ Sistema de inventario vial: API REST para vías (tramos), señales verticales y 
 ```
 backend/
 ├── controllers/     # Manejo HTTP por dominio
-├── services/        # Lógica de negocio (incl. backup.service.js)
+├── services/        # Lógica de negocio; agregados MongoDB en `*.estadisticas.service.js` (vía tramo, ExistSenHor, ExistSenVert)
 ├── models/          # Esquemas Mongoose (+ _register.js para carga conjunta)
 ├── routes/          # Rutas Express
 ├── middlewares/     # auth, jornada, logger, upload
@@ -84,8 +84,8 @@ La API sirve estáticos en **`/uploads`** (fotos referenciadas desde MongoDB).
 
 | Rol | Alcance resumido |
 |-----|------------------|
-| **admin** | Usuarios, jornadas, catálogos, importación Excel, respaldos, purgas, auditoría |
-| **supervisor** | Inventario amplio, reportes, sin gestión de usuarios/catálogos globales |
+| **admin** | Usuarios, jornadas, catálogos, importación Excel, respaldos, purgas, auditoría, estadísticas agregadas |
+| **supervisor** | Inventario amplio, reportes y **estadísticas agregadas** (vía tramos, SH, SV), sin gestión de usuarios/catálogos globales |
 | **encuestador** | Alta/edición de inventario con jornada activa |
 | **invitado** | Lectura (según rutas) |
 
@@ -109,6 +109,18 @@ La API sirve estáticos en **`/uploads`** (fotos referenciadas desde MongoDB).
 | `/backups` | Crear/listar/descargar backup, restaurar (servidor o archivo), purga selectiva |
 | `/imports` | Importación Excel (admin) |
 
+### Estadísticas agregadas (admin y supervisor)
+
+Endpoints **GET** con JWT y rol `admin` o `supervisor`. Devuelven bloques de conteos por campo (y en algunos casos rangos numéricos) para alimentar tablas, porcentajes y gráficos en el frontend.
+
+| Ruta | Colección / alcance |
+|------|----------------------|
+| `GET /via-tramos/estadisticas` | `ViaTramo`: filtros directos por `idJornada`, `fechaDesde` / `fechaHasta` (`fechaCreacion`), `departamento`, `municipio`, `tipoLocalidad`. |
+| `GET /sen-hor/estadisticas` | `ExistSenHor`: misma jornada y rango de fechas sobre la señal; corte geográfico vía tramos vinculados (`idViaTramo` ∈ tramos que cumplan departamento/municipio/tipo localidad). |
+| `GET /sen-vert/estadisticas` | `ExistSenVert`: mismo esquema de filtros que señales horizontales (jornada, fechas de la señal, geo por tramo). |
+
+Implementación: `services/viaTramo.estadisticas.service.js`, `services/existSenHor.estadisticas.service.js`, `services/existSenVert.estadisticas.service.js` y métodos `getEstadisticas` en los controladores/rutas correspondientes (**registrados antes** de rutas con `/:id`).
+
 ### Respaldos (`/backups`, solo admin)
 
 - **POST `/backups/create`** — Genera **`infravial-full-backup-*.zip`**: `manifest.json`, `database.json.gz` (volcado de colecciones) y carpeta **`uploads/`**.
@@ -131,6 +143,7 @@ Incluyen entre otros: `User`, `Audit`, `BackupEvent`, `Jornada`, `Divipol`, `Via
 - **Clasificación vial** (tramos): cálculo automático de anchos y clasificación al guardar (servicio de vía tramo).
 - **Auditoría**: registro en colección y/o logs según configuración.
 - **GeoJSON**: coordenadas en esquemas de inventario; compatibles con mapas en el frontend.
+- **Estadísticas**: agregaciones MongoDB (`$match`, `$group`) reutilizando criterios de filtro coherentes con listados y mapa.
 
 ---
 

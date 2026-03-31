@@ -4,7 +4,7 @@ async function getAll(filtros = {}) {
     return await ExistSenVert.find(filtros)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         })
         .populate('obs1', 'observacion')
@@ -19,7 +19,7 @@ async function getById(id) {
     return await ExistSenVert.findById(id)
         .populate({
             path: 'idViaTramo',
-            select: 'via nomenclatura municipio departamento zat',
+            select: 'via nomenclatura municipio departamento zat tipoUbic',
             populate: { path: 'zat', select: 'zatNumero zatLetra' }
         })
         .populate('obs1', 'observacion')
