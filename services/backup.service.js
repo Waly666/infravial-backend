@@ -95,13 +95,18 @@ function getBackupDownloadPath(fileName) {
 }
 
 /**
- * Sustituye la carpeta uploads del servidor por la del backup (o la deja vacía si el ZIP no trae uploads/).
+ * Sustituye el contenido de uploads/ por el del backup.
+ * En Docker, /app/uploads suele ser volumen montado: no se puede borrar el directorio raíz (EBUSY);
+ * solo se vacían hijos y se copian los archivos del ZIP.
  */
 function replaceUploadsDir(uploadsSrcInExtract) {
-    if (fs.existsSync(UPLOADS_DIR)) {
-        fs.rmSync(UPLOADS_DIR, { recursive: true, force: true });
-    }
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    if (fs.existsSync(UPLOADS_DIR)) {
+        for (const name of fs.readdirSync(UPLOADS_DIR)) {
+            const p = path.join(UPLOADS_DIR, name);
+            fs.rmSync(p, { recursive: true, force: true });
+        }
+    }
     if (fs.existsSync(uploadsSrcInExtract)) {
         fs.cpSync(uploadsSrcInExtract, UPLOADS_DIR, { recursive: true });
     }
