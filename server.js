@@ -22,6 +22,7 @@ const auditRoutes        = require('./routes/audit.routes');
 const dashboardRoutes    = require('./routes/dashboard.routes');
 const backupRoutes       = require('./routes/backup.routes');
 const importRoutes       = require('./routes/import.routes');
+const dataTransferRoutes = require('./routes/data-transfer.routes');
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/audit',            auditRoutes);
 app.use('/dashboard',        dashboardRoutes);
 app.use('/backups',          backupRoutes);
 app.use('/imports',          importRoutes);
+app.use('/data-transfer',    dataTransferRoutes);
 
 // ── Conexión MongoDB ───────────────────────────────
 mongoose.connect(process.env.MONGO_URI)
