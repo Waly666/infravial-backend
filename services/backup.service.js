@@ -25,6 +25,7 @@ const PURGE_GROUPS = {
         'Semaforo',
         'ControlSemaforo',
         'CajaInspeccion',
+        'CategorizacionVial',
         'ObservacionSV',
         'ObservacionSH',
         'ObsSemaforo',
@@ -206,6 +207,74 @@ function writeFullBackupZip(outPath, dbGzBuffer, uploadsRoot) {
         }
         archive.finalize();
     });
+}
+
+/** Normaliza el valor de una colección en el backup a un array de documentos */
+function normalizeDocsForRestore(raw) {
+    if (raw == null) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw !== 'object') return [];
+    const keys = Object.keys(raw);
+    if (keys.length === 0) return [];
+    if (keys.every((k) => /^\d+$/.test(k))) {
+        return keys
+            .sort((a, b) => Number(a) - Number(b))
+            .map((k) => raw[k])
+            .filter(Boolean);
+    }
+    return [raw];
+}
+
+/**
+ * Nombres alternativos → nombre real en Mongo (Mongoose usa «categorizacionvials»).
+ * Evita restaurar 0 docs si el JSON trae la clave con guion (p. ej. copia manual).
+ */
+function mergeCollectionKeyAliases(collections) {
+    const out = { ...collections };
+    const mergeInto = (from, to) => {
+        if (!Object.prototype.hasOwnProperty.call(out, from)) return;
+        const incoming = normalizeDocsForRestore(out[from]);
+        delete out[from];
+        if (!incoming.length) return;
+        const existing = normalizeDocsForRestore(out[to]);
+        out[to] = existing.length ? [...existing, ...incoming] : incoming;
+    };
+    mergeInto('categorizacion-vial', 'categorizacionvials');
+    mergeInto('categorizacionvial', 'categorizacionvials');
+    return out;
+}
+
+function isBSONLeaf(val) {
+    if (val == null || typeof val !== 'object') return true;
+    if (val instanceof Date) return true;
+    if (val._bsontype === 'ObjectID' || val._bsontype === 'ObjectId') return true;
+    if (
+        Buffer.isBuffer(val) ||
+        val._bsontype === 'Binary' ||
+        val._bsontype === 'Decimal128' ||
+        val._bsontype === 'Long' ||
+        val._bsontype === 'Double' ||
+        val._bsontype === 'Int32'
+    ) {
+        return true;
+    }
+    return false;
+}
+
+function stripUndefinedDeep(val) {
+    if (val === undefined) return undefined;
+    if (val === null) return null;
+    if (isBSONLeaf(val)) return val;
+    if (Array.isArray(val)) {
+        return val.map((x) => stripUndefinedDeep(x)).filter((x) => x !== undefined);
+    }
+    const o = {};
+    for (const [k, v] of Object.entries(val)) {
+        if (v === undefined) continue;
+        const x = stripUndefinedDeep(v);
+        if (x !== undefined) o[k] = x;
+    }
+    return o;
 }
 
 async function applyRestoreFromZippedBuffer(

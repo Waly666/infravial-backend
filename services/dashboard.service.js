@@ -5,6 +5,7 @@ const Semaforo         = require('../models/Semaforo');
 const ControlSemaforo  = require('../models/ControlSemaforo');
 const Jornada          = require('../models/Jornada');
 const CajaInspeccion   = require('../models/CajaInspeccion');
+const CategorizacionVial = require('../models/CategorizacionVial');
 
 function groupBy(Model, field, match) {
     const pipeline = [];
@@ -39,6 +40,7 @@ async function getStats(filters = {}) {
         totalSemaforos,
         totalControlSem,
         totalCajasInsp,
+        totalCategVial,
         jornadaActiva,
         senVertEstados,
         senHorEstados,
@@ -65,6 +67,7 @@ async function getStats(filters = {}) {
         Semaforo.countDocuments(relMatch),
         ControlSemaforo.countDocuments(relMatch),
         CajaInspeccion.countDocuments(relMatch),
+        CategorizacionVial.countDocuments(tramoFilter),
         Jornada.findOne({ estado: 'EN PROCESO' }),
         groupBy(ExistSenVert, 'estado', hasGeoFilter ? relMatch : null),
         groupBy(ExistSenHor, 'estadoDem', hasGeoFilter ? relMatch : null),
@@ -97,6 +100,7 @@ async function getStats(filters = {}) {
         totalSemaforos,
         totalControlSem,
         totalCajasInsp,
+        totalCategVial,
         jornadaActiva,
         senVertEstados,
         senHorEstados,

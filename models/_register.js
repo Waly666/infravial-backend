@@ -8,6 +8,7 @@ require('./ExistSenHor');
 require('./Semaforo');
 require('./ControlSemaforo');
 require('./CajaInspeccion');
+require('./CategorizacionVial');
 require('./ObservacionSV');
 require('./ObservacionSH');
 require('./ObsSemaforo');

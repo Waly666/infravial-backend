@@ -13,6 +13,7 @@ const ExistSenHor     = require('../models/ExistSenHor');
 const Semaforo        = require('../models/Semaforo');
 const ControlSemaforo = require('../models/ControlSemaforo');
 const CajaInspeccion  = require('../models/CajaInspeccion');
+const CategorizacionVial = require('../models/CategorizacionVial');
 const Divipol         = require('../models/Divipol');
 const Zat             = require('../models/Zat');
 const Comuna          = require('../models/Comuna');
@@ -70,6 +71,13 @@ const OPER_TABLES = [
     { key: 'semaforos',        model: Semaforo,        label: 'Semáforos',          filterType: 'via-tramo'      },
     { key: 'control-semaforo', model: ControlSemaforo, label: 'Control Semáforo',   filterType: 'via-tramo'      },
     { key: 'cajas-inspeccion', model: CajaInspeccion,  label: 'Cajas Inspección',   filterType: 'via-tramo'      },
+    {
+        key: 'categorizacion-vial',
+        model: CategorizacionVial,
+        label: 'Categorización Vial',
+        /** Mismo dept./mun. que vía-tramos; sin idJornada: jornada → filtro por dpto/mun. de la jornada */
+        filterType: 'direct-categ'
+    },
 ];
 
 const CATALOG_TABLES = [
@@ -154,6 +162,64 @@ function escapeRegex(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/** Sin tildes/diacríticos — alinea «Popayán» con «POPAYAN» en comparaciones por regex. */
+function foldDiacritics(s) {
+    return String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+}
+
+/** Variantes regex (original + sin diacríticos) para un campo textual. */
+function matchFieldFlexibleConds(fieldName, raw) {
+    const v1 = String(raw).trim();
+    if (!v1) return [];
+    const v2 = foldDiacritics(v1);
+    const conds = [{ [fieldName]: { $regex: new RegExp(`^${escapeRegex(v1)}$`, 'i') } }];
+    if (v2 !== v1) {
+        conds.push({ [fieldName]: { $regex: new RegExp(`^${escapeRegex(v2)}$`, 'i') } });
+    }
+    return conds;
+}
+
+function applyFlexibleFieldToFilter(filter, fieldName, rawValue) {
+    const conds = matchFieldFlexibleConds(fieldName, rawValue);
+    if (!conds.length) return;
+    if (conds.length === 1) Object.assign(filter, conds[0]);
+    else filter.$or = conds;
+}
+
+/** Par departamento + municipio (para categorización vial / mismo criterio geo que un tramo). */
+function matchDeptMunPair(depRaw, munRaw) {
+    const dConds = matchFieldFlexibleConds('departamento', depRaw);
+    const mConds = matchFieldFlexibleConds('municipio', munRaw);
+    if (!dConds.length || !mConds.length) return null;
+    return { $and: [{ $or: dConds }, { $or: mConds }] };
+}
+
+/** $match por idJornada tolerando ObjectId o string (datos legacy). */
+function matchIdJornadaClause(jidVal) {
+    const oid = new Types.ObjectId(jidVal);
+    const asStr = String(oid);
+    return { $or: [{ idJornada: oid }, { idJornada: asStr }] };
+}
+
+/**
+ * Combina criterio geo y rango fechaCreacion en un único $and
+ * (evita comportamientos ambiguos con $or + campo fecha a la vez).
+ */
+function appendFechaCreacionToFilter(baseFilter, fechaDesde, fechaHasta) {
+    if (!fechaDesde && !fechaHasta) return baseFilter;
+    const fc = {};
+    if (fechaDesde) fc.$gte = new Date(fechaDesde);
+    if (fechaHasta) fc.$lte = new Date(fechaHasta + 'T23:59:59.999Z');
+    const fechaClause = { fechaCreacion: fc };
+    if (!baseFilter || typeof baseFilter !== 'object' || !Object.keys(baseFilter).length) {
+        return fechaClause;
+    }
+    return { $and: [baseFilter, fechaClause] };
+}
+
 /** Construye el filtro MongoDB según tipo */
 async function buildFilter(filterType, tipoFiltro, valorFiltro, viaIds, fechaDesde, fechaHasta) {
     const filter = {};
@@ -182,15 +248,66 @@ async function buildFilter(filterType, tipoFiltro, valorFiltro, viaIds, fechaDes
             if (!viaIds || viaIds.length === 0) return null;
             filter.idViaTramo = { $in: viaIds };
         }
+    } else if (filterType === 'direct-categ') {
+        if (tipoFiltro === 'departamento') {
+            applyFlexibleFieldToFilter(filter, 'departamento', valorFiltro);
+        } else if (tipoFiltro === 'municipio') {
+            applyFlexibleFieldToFilter(filter, 'municipio', valorFiltro);
+        } else if (tipoFiltro === 'jornada') {
+            if (!Types.ObjectId.isValid(valorFiltro)) return null;
+            const jid = new Types.ObjectId(valorFiltro);
+            const jidStr = String(jid);
+            /** Documentos vinculados por idJornada (colección categorizacionvials) o por geo de tramos (legacy). */
+            const idJornadaBranches = [{ idJornada: jid }, { idJornada: jidStr }];
+            /**
+             * Pares (departamento, municipio) únicos en vía-tramos de la jornada.
+             * idJornada puede estar como ObjectId o string; se usa agregación + $match amplio.
+             * Incluye coincidencia exacta (como en BD) y ramas regex (tildes / mayúsculas).
+             */
+            const rows = await ViaTramo.aggregate([
+                { $match: matchIdJornadaClause(jid) },
+                {
+                    $match: {
+                        departamento: { $exists: true, $nin: ['', null] },
+                        municipio: { $exists: true, $nin: ['', null] }
+                    }
+                },
+                { $group: { _id: { d: '$departamento', m: '$municipio' } } }
+            ]);
+            const seen = new Set();
+            const orBranches = [...idJornadaBranches];
+            for (const row of rows) {
+                const d = row._id && row._id.d != null ? String(row._id.d).trim() : '';
+                const m = row._id && row._id.m != null ? String(row._id.m).trim() : '';
+                if (!d || !m) continue;
+                const sig = `${foldDiacritics(d)}|${foldDiacritics(m)}`;
+                if (seen.has(sig)) continue;
+                seen.add(sig);
+                orBranches.push({ departamento: d, municipio: m });
+                const flex = matchDeptMunPair(d, m);
+                if (flex) orBranches.push(flex);
+            }
+            if (orBranches.length === idJornadaBranches.length) {
+                const j = await Jornada.findById(jid).select('dpto municipio').lean();
+                if (j && (j.dpto || j.municipio)) {
+                    const d = String(j.dpto || '').trim();
+                    const m = String(j.municipio || '').trim();
+                    if (d && m) {
+                        const sig = `${foldDiacritics(d)}|${foldDiacritics(m)}`;
+                        if (!seen.has(sig)) {
+                            seen.add(sig);
+                            orBranches.push({ departamento: d, municipio: m });
+                            const flex = matchDeptMunPair(d, m);
+                            if (flex) orBranches.push(flex);
+                        }
+                    }
+                }
+            }
+            filter.$or = orBranches;
+        }
     }
 
-    if (fechaDesde || fechaHasta) {
-        filter.fechaCreacion = {};
-        if (fechaDesde) filter.fechaCreacion.$gte = new Date(fechaDesde);
-        if (fechaHasta) filter.fechaCreacion.$lte = new Date(fechaHasta + 'T23:59:59.999Z');
-    }
-
-    return filter;
+    return appendFechaCreacionToFilter(filter, fechaDesde, fechaHasta);
 }
 
 /** Consulta una tabla en lotes y reporta progreso */
@@ -250,7 +367,7 @@ function restoreObjectIds(row) {
     const DATE_FIELDS = [
         'fechaCreacion', 'fechaModificacion', 'fechaInv',
         'fechaInst', 'fechaAccion', 'fechaInicio',
-        'fechaJornada', 'horaInicio'
+        'fechaJornada', 'horaInicio', 'fechaClasificacion'
     ];
     for (const f of DATE_FIELDS) {
         if (doc[f] && typeof doc[f] === 'string') {
