@@ -24,6 +24,7 @@ const backupRoutes       = require('./routes/backup.routes');
 const importRoutes       = require('./routes/import.routes');
 const dataTransferRoutes      = require('./routes/data-transfer.routes');
 const categorizacionVialRoutes = require('./routes/categorizacion-vial.routes');
+const sincRoutes               = require('./routes/sinc.routes');
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use('/backups',          backupRoutes);
 app.use('/imports',          importRoutes);
 app.use('/data-transfer',      dataTransferRoutes);
 app.use('/categorizacion-vial', categorizacionVialRoutes);
+app.use('/sinc',                sincRoutes);
 
 // ── Conexión MongoDB ───────────────────────────────
 mongoose.connect(process.env.MONGO_URI)

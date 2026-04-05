@@ -18,6 +18,16 @@ async function getAll(req, res) {
         res.status(500).json({ message: err.message });
     }
 }
+async function getInventario(req, res) {
+    try {
+        const data = await viaTramoService.getInventarioPorTramo(req.params.id);
+        if (!data) return res.status(404).json({ message: 'Tramo no encontrado INFRAVIAL' });
+        res.json({ message: 'Inventario vinculado al tramo', ...data });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 async function getById(req, res) {
     try {
         console.log('Buscando tramo ID:', req.params.id);
@@ -69,4 +79,4 @@ async function remove(req, res) {
     }
 }
 
-module.exports = { getEstadisticas, getAll, getById, create, update, remove };
+module.exports = { getEstadisticas, getAll, getInventario, getById, create, update, remove };

@@ -1,4 +1,10 @@
+const mongoose = require('mongoose');
 const ViaTramo = require('../models/ViaTramo');
+const ExistSenVert = require('../models/ExistSenVert');
+const ExistSenHor = require('../models/ExistSenHor');
+const CajaInspeccion = require('../models/CajaInspeccion');
+const ControlSemaforo = require('../models/ControlSemaforo');
+const Semaforo = require('../models/Semaforo');
 
 // Calcular clasNacional según anchoTotalPerfil
 function calcularClasNacional(ancho) {
@@ -107,4 +113,60 @@ async function remove(id) {
     return await ViaTramo.findByIdAndDelete(id);
 }
 
-module.exports = { getAll, getById, create, update, remove };
+/**
+ * Registros vinculados al tramo (mismas cinco familias que el inventario vial por tramo).
+ */
+async function getInventarioPorTramo(idViaTramo) {
+    if (!mongoose.isValidObjectId(idViaTramo)) return null;
+    const oid = new mongoose.Types.ObjectId(idViaTramo);
+    const tramo = await ViaTramo.findById(idViaTramo)
+        .select('via municipio departamento nomenclatura tipoUbic calzada tipoVia estadoVia')
+        .populate('zat', 'zatNumero zatLetra')
+        .lean();
+    if (!tramo) return null;
+
+    const [senVerticales, senHorizontales, cajasInspeccion, controlesSemaforicos, semaforos] =
+        await Promise.all([
+            ExistSenVert.find({ idViaTramo: oid })
+                .select(
+                    'codSe estado fechaInst ubicacion urlFotoSenVert forma orientacion matPlaca fechaCreacion'
+                )
+                .sort({ fechaCreacion: -1 })
+                .lean(),
+            ExistSenHor.find({ idViaTramo: oid })
+                .select(
+                    'codSeHor tipoDem estadoDem fechaInst ubicacion urlFotoSH color fechaCreacion'
+                )
+                .sort({ fechaCreacion: -1 })
+                .lean(),
+            CajaInspeccion.find({ idViaTramo: oid })
+                .select(
+                    'materialCaja fase estadoCaja ubicacion urlFotoCaja fechaCreacion'
+                )
+                .sort({ fechaCreacion: -1 })
+                .lean(),
+            ControlSemaforo.find({ idViaTramo: oid })
+                .select(
+                    'numExterno tipoControlador estadoControlador ubicacion fase urlFotoControlador fechaCreacion'
+                )
+                .sort({ fechaCreacion: -1 })
+                .lean(),
+            Semaforo.find({ idViaTramo: oid })
+                .select(
+                    'numExterno sitio claseSem ubicacion fase semaforoFunciona fechaCreacion'
+                )
+                .sort({ fechaCreacion: -1 })
+                .lean()
+        ]);
+
+    return {
+        tramo,
+        senVerticales,
+        senHorizontales,
+        cajasInspeccion,
+        controlesSemaforicos,
+        semaforos
+    };
+}
+
+module.exports = { getAll, getById, create, update, remove, getInventarioPorTramo };

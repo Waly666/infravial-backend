@@ -54,6 +54,15 @@ const uploadFotoSenHor     = multer({ storage: getStorage('fotos/sen-hor'),     
 const uploadFotoSemaforo   = multer({ storage: getStorage('fotos/semaforos'),     fileFilter, limits });
 const uploadFotoControlSem = multer({ storage: getStorage('fotos/control-sem'),   fileFilter, limits });
 
+// Fotos SINC
+const uploadFotoSincEje      = multer({ storage: getStorage('fotos/sinc/ejes'),         fileFilter, limits });
+const uploadFotoSincPuente   = multer({ storage: getStorage('fotos/sinc/puentes'),      fileFilter, limits });
+const uploadFotoSincMuro     = multer({ storage: getStorage('fotos/sinc/muros'),        fileFilter, limits });
+const uploadFotoSincTunel    = multer({ storage: getStorage('fotos/sinc/tuneles'),      fileFilter, limits });
+const uploadFotoSincSitio    = multer({ storage: getStorage('fotos/sinc/sitios'),       fileFilter, limits });
+const uploadFotoSincDrenaje  = multer({ storage: getStorage('fotos/sinc/drenaje'),      fileFilter, limits });
+const uploadFotoSincMc       = multer({ storage: getStorage('fotos/sinc/mc'),            fileFilter, limits });
+
 // Fotos de catálogos
 const uploadCatSenVert     = multer({ storage: getStorageCatalogo('sen-vert'),       fileFilter, limits });
 const uploadCatEsquema     = multer({ storage: getStorageCatalogo('esquema-perfil'), fileFilter, limits });
@@ -66,6 +75,13 @@ module.exports = {
     uploadFotoSenHor,
     uploadFotoSemaforo,
     uploadFotoControlSem,
+    uploadFotoSincEje,
+    uploadFotoSincPuente,
+    uploadFotoSincMuro,
+    uploadFotoSincTunel,
+    uploadFotoSincSitio,
+    uploadFotoSincDrenaje,
+    uploadFotoSincMc,
     uploadCatSenVert,
     uploadCatEsquema,
     uploadCatUbicSenHor,
