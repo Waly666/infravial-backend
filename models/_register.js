@@ -26,3 +26,20 @@ require('./Jornada');
 require('./Divipol');
 require('./Audit');
 require('./BackupEvent');
+// Modelos SINC
+require('./SincEje');
+require('./SincPropiedades');
+require('./SincFotoEje');
+require('./SincPuente');
+require('./SincPonton');
+require('./SincObraDrenaje');
+require('./SincInterseccion');
+require('./SincDefensa');
+require('./SincMuro');
+require('./SincTalude');
+require('./SincTunel');
+require('./SincEstructuraPavimento');
+require('./SincPrs');
+require('./SincSenal');
+require('./SincSitioCritico');
+require('./SincMc'); // registra SincMcBerma, SincMcCalzada, … (17 capas)

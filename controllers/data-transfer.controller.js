@@ -20,6 +20,24 @@ const Comuna          = require('../models/Comuna');
 const Barrio          = require('../models/Barrio');
 const Jornada         = require('../models/Jornada');
 
+// Modelos SINC
+const SincEje              = require('../models/SincEje');
+const SincPropiedades      = require('../models/SincPropiedades');
+const SincFotoEje          = require('../models/SincFotoEje');
+const SincPuente           = require('../models/SincPuente');
+const SincPonton           = require('../models/SincPonton');
+const SincObraDrenaje      = require('../models/SincObraDrenaje');
+const SincInterseccion     = require('../models/SincInterseccion');
+const SincDefensa          = require('../models/SincDefensa');
+const SincMuro             = require('../models/SincMuro');
+const SincTalude           = require('../models/SincTalude');
+const SincTunel            = require('../models/SincTunel');
+const SincEstructuraPavimento = require('../models/SincEstructuraPavimento');
+const SincMcModels         = require('../models/SincMc');
+const SincPrs              = require('../models/SincPrs');
+const SincSenal            = require('../models/SincSenal');
+const SincSitioCritico     = require('../models/SincSitioCritico');
+
 const UPLOADS_DIR     = path.join(__dirname, '..', 'uploads');
 const EXPORTS_DIR     = path.join(__dirname, '..', 'exports');
 const IMPORTS_TMP_DIR = path.join(__dirname, '..', 'imports-tmp');
@@ -87,12 +105,50 @@ const CATALOG_TABLES = [
     { key: 'barrios', model: Barrio,  label: 'Barrios' },
 ];
 
+// SINC: SincEje va primero (referencia Jornada); los demás referencian SincEje
+const SINC_TABLES = [
+    { key: 'sinc-ejes',            model: SincEje,               label: 'SINC Ejes',              filterType: 'sinc-direct' },
+    { key: 'sinc-propiedades',     model: SincPropiedades,       label: 'SINC Propiedades',       filterType: 'sinc-eje' },
+    { key: 'sinc-fotos-eje',       model: SincFotoEje,           label: 'SINC Fotos Eje',         filterType: 'sinc-eje' },
+    { key: 'sinc-puentes',         model: SincPuente,            label: 'SINC Puentes',           filterType: 'sinc-eje' },
+    { key: 'sinc-pontones',        model: SincPonton,            label: 'SINC Pontones',          filterType: 'sinc-eje' },
+    { key: 'sinc-obras-drenaje',   model: SincObraDrenaje,       label: 'SINC Obras Drenaje',     filterType: 'sinc-eje' },
+    { key: 'sinc-intersecciones',  model: SincInterseccion,      label: 'SINC Intersecciones',    filterType: 'sinc-eje' },
+    { key: 'sinc-defensas',        model: SincDefensa,           label: 'SINC Defensas',          filterType: 'sinc-eje' },
+    { key: 'sinc-muros',           model: SincMuro,              label: 'SINC Muros',             filterType: 'sinc-eje' },
+    { key: 'sinc-taludes',         model: SincTalude,            label: 'SINC Taludes',           filterType: 'sinc-eje' },
+    { key: 'sinc-tuneles',         model: SincTunel,             label: 'SINC Túneles',           filterType: 'sinc-eje' },
+    { key: 'sinc-est-pavimento',   model: SincEstructuraPavimento, label: 'SINC Est. Pavimento',  filterType: 'sinc-eje' },
+    // Nivel Detallado Mc — 17 capas (todas referencian idEje)
+    { key: 'sinc-mc-berma',           model: SincMcModels.SincMcBerma,          label: 'SINC MC Berma',           filterType: 'sinc-eje' },
+    { key: 'sinc-mc-calzada',         model: SincMcModels.SincMcCalzada,        label: 'SINC MC Calzada',         filterType: 'sinc-eje' },
+    { key: 'sinc-mc-cco',             model: SincMcModels.SincMcCco,            label: 'SINC MC CCO',             filterType: 'sinc-eje' },
+    { key: 'sinc-mc-cicloruta',       model: SincMcModels.SincMcCicloruta,      label: 'SINC MC Cicloruta',       filterType: 'sinc-eje' },
+    { key: 'sinc-mc-cuneta',          model: SincMcModels.SincMcCuneta,         label: 'SINC MC Cuneta',          filterType: 'sinc-eje' },
+    { key: 'sinc-mc-defensa-vial',    model: SincMcModels.SincMcDefensaVial,    label: 'SINC MC Defensa Vial',    filterType: 'sinc-eje' },
+    { key: 'sinc-mc-dispositivo-its', model: SincMcModels.SincMcDispositivoIts, label: 'SINC MC Dispositivo ITS', filterType: 'sinc-eje' },
+    { key: 'sinc-mc-drenaje',         model: SincMcModels.SincMcDrenaje,        label: 'SINC MC Drenaje',         filterType: 'sinc-eje' },
+    { key: 'sinc-mc-estacion-peaje',  model: SincMcModels.SincMcEstacionPeaje,  label: 'SINC MC Est. Peaje',      filterType: 'sinc-eje' },
+    { key: 'sinc-mc-estacion-pesaje', model: SincMcModels.SincMcEstacionPesaje, label: 'SINC MC Est. Pesaje',     filterType: 'sinc-eje' },
+    { key: 'sinc-mc-luminaria',       model: SincMcModels.SincMcLuminaria,      label: 'SINC MC Luminaria',       filterType: 'sinc-eje' },
+    { key: 'sinc-mc-muro',            model: SincMcModels.SincMcMuro,           label: 'SINC MC Muro',            filterType: 'sinc-eje' },
+    { key: 'sinc-mc-puente',          model: SincMcModels.SincMcPuente,         label: 'SINC MC Puente',          filterType: 'sinc-eje' },
+    { key: 'sinc-mc-senal-vertical',  model: SincMcModels.SincMcSenalVertical,  label: 'SINC MC Señal Vertical',  filterType: 'sinc-eje' },
+    { key: 'sinc-mc-separador',       model: SincMcModels.SincMcSeparador,      label: 'SINC MC Separador',       filterType: 'sinc-eje' },
+    { key: 'sinc-mc-tunel',           model: SincMcModels.SincMcTunel,          label: 'SINC MC Túnel',           filterType: 'sinc-eje' },
+    { key: 'sinc-mc-zona-servicio',   model: SincMcModels.SincMcZonaServicio,   label: 'SINC MC Zona Servicio',   filterType: 'sinc-eje' },
+    { key: 'sinc-prs',                model: SincPrs,                           label: 'SINC PRS',                filterType: 'sinc-eje' },
+    { key: 'sinc-senales',         model: SincSenal,             label: 'SINC Señales',           filterType: 'sinc-eje' },
+    { key: 'sinc-sitios-criticos', model: SincSitioCritico,      label: 'SINC Sitios Críticos',   filterType: 'sinc-eje' },
+];
+
 // ALL_TABLES define también el ORDEN de importación:
-// Jornadas → Catálogos → ViaTramos → Señales/Semáforos (respeta dependencias)
+// Jornadas → Catálogos → ViaTramos → Señales/Semáforos → SINC (SincEje antes que sus dependientes)
 const ALL_TABLES = [
     OPER_TABLES[0],          // jornadas
     ...CATALOG_TABLES,       // divipol, zat, comunas, barrios
-    ...OPER_TABLES.slice(1), // via-tramos, sen-vert, sen-hor, semaforos, control-sem, cajas
+    ...OPER_TABLES.slice(1), // via-tramos, sen-vert, sen-hor, semaforos, control-sem, cajas, categorizacion-vial
+    ...SINC_TABLES,          // sinc-ejes y sus dependientes
 ];
 
 // ── Utilidades ────────────────────────────────────────────────────────────────
@@ -221,7 +277,7 @@ function appendFechaCreacionToFilter(baseFilter, fechaDesde, fechaHasta) {
 }
 
 /** Construye el filtro MongoDB según tipo */
-async function buildFilter(filterType, tipoFiltro, valorFiltro, viaIds, fechaDesde, fechaHasta) {
+async function buildFilter(filterType, tipoFiltro, valorFiltro, viaIds, ejeIds, fechaDesde, fechaHasta) {
     const filter = {};
     const safe   = escapeRegex(valorFiltro);
 
@@ -248,6 +304,29 @@ async function buildFilter(filterType, tipoFiltro, valorFiltro, viaIds, fechaDes
             if (!viaIds || viaIds.length === 0) return null;
             filter.idViaTramo = { $in: viaIds };
         }
+    } else if (filterType === 'sinc-direct') {
+        // Siempre filtrar SincEje por idJornada (evita inconsistencias en campos geo de SincEje)
+        if (tipoFiltro === 'jornada') {
+            if (!Types.ObjectId.isValid(valorFiltro)) return null;
+            const jid    = new Types.ObjectId(valorFiltro);
+            const jidStr = String(jid);
+            Object.assign(filter, { $or: [{ idJornada: jid }, { idJornada: jidStr }] });
+        } else {
+            // municipio o departamento: derivar IDs de Jornada y filtrar SincEje por idJornada
+            // Jornada usa 'dpto' para departamento
+            const jorField = tipoFiltro === 'departamento' ? 'dpto' : 'municipio';
+            const jorns = await Jornada.find({
+                [jorField]: { $regex: new RegExp(`^${safe}$`, 'i') }
+            }).select('_id').lean();
+            if (!jorns.length) return null;
+            const jorIds    = jorns.map(j => j._id);
+            const jorStrIds = jorns.map(j => String(j._id));
+            Object.assign(filter, { $or: [{ idJornada: { $in: jorIds } }, { idJornada: { $in: jorStrIds } }] });
+        }
+    } else if (filterType === 'sinc-eje') {
+        // Tablas hijas de SincEje: filtrar por idEje
+        if (!ejeIds || ejeIds.length === 0) return null;
+        filter.idEje = { $in: ejeIds };
     } else if (filterType === 'direct-categ') {
         if (tipoFiltro === 'departamento') {
             applyFlexibleFieldToFilter(filter, 'departamento', valorFiltro);
@@ -353,7 +432,7 @@ function restoreObjectIds(row) {
     const doc = { ...row };
 
     const OID_FIELDS = [
-        '_id', 'idJornada', 'idViaTramo', 'idControSem',
+        '_id', 'idJornada', 'idViaTramo', 'idControSem', 'idEje',
         'zat', 'comuna', 'barrio', 'perfilEsquema',
         'obs1', 'obs2', 'obs3', 'obs4', 'obs5', 'obs6',
         'creadoPor', 'modificadoPor'
@@ -385,20 +464,46 @@ async function runExportJob(jobId, tipoFiltro, valorFiltro, fechaDesde, fechaHas
     if (!job) return;
 
     try {
-        // Pre-calcular viaIds para filtros por dept/municipio
+        // Pre-calcular viaIds y ejeIds para filtros por dept/municipio/jornada
         const safe = escapeRegex(valorFiltro);
         let viaIds = null;
+        let ejeIds = null;
         if (tipoFiltro === 'departamento' || tipoFiltro === 'municipio') {
-            const viaFilter = tipoFiltro === 'departamento'
+            const geoFilter = tipoFiltro === 'departamento'
                 ? { departamento: { $regex: new RegExp(`^${safe}$`, 'i') } }
                 : { municipio:    { $regex: new RegExp(`^${safe}$`, 'i') } };
             if (fechaDesde || fechaHasta) {
-                viaFilter.fechaCreacion = {};
-                if (fechaDesde) viaFilter.fechaCreacion.$gte = new Date(fechaDesde);
-                if (fechaHasta) viaFilter.fechaCreacion.$lte = new Date(fechaHasta + 'T23:59:59.999Z');
+                geoFilter.fechaCreacion = {};
+                if (fechaDesde) geoFilter.fechaCreacion.$gte = new Date(fechaDesde);
+                if (fechaHasta) geoFilter.fechaCreacion.$lte = new Date(fechaHasta + 'T23:59:59.999Z');
             }
-            const vias = await ViaTramo.find(viaFilter).select('_id').lean();
+                // viaIds: filtro geo directo en ViaTramo
+            const vias = await ViaTramo.find(geoFilter).select('_id').lean();
             viaIds = vias.map(v => v._id);
+
+            // ejeIds: buscar via Jornada para evitar inconsistencias en SincEje.departamento/municipio
+            // Jornada usa 'dpto' para departamento (no 'departamento')
+            const jorField = tipoFiltro === 'departamento' ? 'dpto' : 'municipio';
+            const jorns = await Jornada.find({
+                [jorField]: { $regex: new RegExp(`^${safe}$`, 'i') }
+            }).select('_id').lean();
+            const jorIds    = jorns.map(j => j._id);
+            const jorStrIds = jorns.map(j => String(j._id));
+            const ejes = await SincEje.find({
+                $or: [{ idJornada: { $in: jorIds } }, { idJornada: { $in: jorStrIds } }]
+            }).select('_id').lean();
+            ejeIds = ejes.map(e => e._id);
+            console.log(`[dt] viaIds:${viaIds.length} jorns:${jorns.length} ejeIds:${ejeIds.length}`);
+
+        } else if (tipoFiltro === 'jornada' && Types.ObjectId.isValid(valorFiltro)) {
+            const jid    = new Types.ObjectId(valorFiltro);
+            const jidStr = String(jid);
+            // idJornada en SincEje puede estar guardado como ObjectId o string
+            const ejes = await SincEje.find({
+                $or: [{ idJornada: jid }, { idJornada: jidStr }]
+            }).select('_id').lean();
+            ejeIds = ejes.map(e => e._id);
+            console.log(`[data-transfer] jornada=${valorFiltro} → ejeIds: ${ejeIds.length}`);
         }
 
         const tablas = ALL_TABLES.filter(t => tablasSeleccionadas.includes(t.key));
@@ -418,7 +523,9 @@ async function runExportJob(jobId, tipoFiltro, valorFiltro, fechaDesde, fechaHas
             const isCatalog = CATALOG_TABLES.some(c => c.key === t.key);
             const filter = isCatalog
                 ? {}
-                : await buildFilter(t.filterType, tipoFiltro, valorFiltro, viaIds, fechaDesde, fechaHasta);
+                : await buildFilter(t.filterType, tipoFiltro, valorFiltro, viaIds, ejeIds, fechaDesde, fechaHasta);
+
+            console.log(`[dt:export] tabla=${t.key} filterType=${t.filterType} filter=${filter === null ? 'NULL' : JSON.stringify(filter)}`);
 
             if (filter === null) {
                 job.tables[t.key].status = 'done';
