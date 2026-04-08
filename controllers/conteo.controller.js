@@ -5,6 +5,7 @@ const SentidoConteo  = require('../models/SentidoConteo');
 const CatConteo      = require('../models/CatConteo');
 const ProyectoConteo = require('../models/ProyectoConteo');
 const SesionConteo   = require('../models/SesionConteo');
+const Jornada        = require('../models/Jornada');
 
 // ── Clientes SSE conectados por conteo ────────────────────────────────────────
 const sseClients = {}; // { idConteo: [res, res, ...] }
@@ -262,6 +263,15 @@ exports.detalle = {
 };
 
 // ── CATÁLOGOS ─────────────────────────────────────────────────────────────────
+exports.getJornadasEnProceso = async (req, res) => {
+    try {
+        const datos = await Jornada.find({ estado: 'EN PROCESO' })
+            .select('dpto municipio localidad supervisor fechaJornada')
+            .sort({ fechaJornada: -1 });
+        res.json({ datos });
+    } catch (e) { res.status(500).json({ message: e.message }); }
+};
+
 exports.catalogo = {
     getCats: async (req, res) => {
         try {

@@ -5,8 +5,9 @@ const { authenticateToken, isAdmin, hasRole } = require('../middlewares/auth.mid
 const isSupervisor = hasRole('admin', 'supervisor');
 
 // ── CATÁLOGOS (lectura pública autenticada) ───────────────────────────────────
-router.get('/catalogos/cats',     authenticateToken, ctrl.catalogo.getCats);
-router.get('/catalogos/sentidos', authenticateToken, ctrl.catalogo.getSentidos);
+router.get('/catalogos/cats',          authenticateToken, ctrl.catalogo.getCats);
+router.get('/catalogos/sentidos',      authenticateToken, ctrl.catalogo.getSentidos);
+router.get('/catalogos/jornadas',      authenticateToken, ctrl.getJornadasEnProceso);
 
 // ── PROYECTOS ─────────────────────────────────────────────────────────────────
 router.get   ('/proyectos',                authenticateToken,                ctrl.proyecto.getAll);
