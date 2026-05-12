@@ -1,4 +1,16 @@
 node_modules
 .env
+.env.*
 *.log
+logs
 uploads/*
+!uploads/catalogos
+backups
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+README.md
+Dockerfile
+.dockerignore
